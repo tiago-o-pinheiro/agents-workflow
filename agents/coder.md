@@ -56,6 +56,7 @@ When the same failure survives 2 attempts, or the design is ambiguous, spawn `de
 
 ## Rules
 
+- Create and change files only with Write and Edit. Bash runs commands (checks, git, scripts), never writes files: heredocs, `sed -i`, `python` or `>` redirects trigger permission prompts and are denied when you run in the background.
 - Touch only files in scope. Needing others: return BLOCKED with a QUESTION.
 - Never disable lint rules, skip or delete tests, or use `any`, `as`, `!`, or ts-comments to get green.
 - No commented-out code, no TODOs.

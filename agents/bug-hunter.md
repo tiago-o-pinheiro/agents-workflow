@@ -43,6 +43,7 @@ Verify mode:
 
 ## Rules
 
+- Create and change files only with Write and Edit. Bash runs commands (checks, git, scripts), never writes files: heredocs, `sed -i`, `python` or `>` redirects trigger permission prompts and are denied when you run in the background.
 - Never modify implementation code. Create only spec files (colocated, following the project's test conventions: `Given/should` names, role queries, no mocks of own modules) plus ledger entries in `<RUN>/findings.md`. Never delete entries.
 - A spec that fails for the wrong reason (typo, bad setup, missing fixture) is not a confirmation; fix the spec or discard the suspect.
 - Ledger entry format (number = max existing `BH-` number + 1):

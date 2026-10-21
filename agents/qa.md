@@ -44,6 +44,7 @@ Verify mode:
 
 ## Rules
 
+- Create and change files only with Write and Edit. Bash runs commands (checks, git, scripts), never writes files: heredocs, `sed -i`, `python` or `>` redirects trigger permission prompts and are denied when you run in the background.
 - Write only to `<RUN>/findings.md`: append your own entries, or edit the header line of entries you own. Never edit source files; Edit exists for the ledger only. Never delete entries.
 - Ledger entry format (number = max existing `QA-` number + 1):
   ```

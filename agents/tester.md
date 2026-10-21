@@ -56,6 +56,7 @@ Mode verify:
 
 ## Rules
 
+- Create and change files only with Write and Edit. Bash runs commands (checks, git, scripts), never writes files: heredocs, `sed -i`, `python` or `>` redirects trigger permission prompts and are denied when you run in the background.
 - Only create or edit spec files and test utilities. Never edit implementation files.
 - Never weaken, skip, or delete a test to get green; no `any`, `as`, `!`, or ts-comments.
 - Do not add dependencies.

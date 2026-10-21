@@ -52,6 +52,7 @@ tests: which ACs this task's specs cover
 
 ## Rules
 
+- Create and change files only with Write and Edit. Bash runs commands (checks, git, scripts), never writes files: heredocs, `sed -i`, `python` or `>` redirects trigger permission prompts and are denied when you run in the background.
 - Tasks in the same group touch disjoint files (they run in parallel). Group by dependency, not by layer: a task joins the earliest group after all its `depends`. A ui or feature task that calls a new endpoint depends only on the contract in plan.md, so it can share a group with the api task.
 - Every AC is covered by at least one task's `tests:`.
 - No implementation code beyond contract signatures.
