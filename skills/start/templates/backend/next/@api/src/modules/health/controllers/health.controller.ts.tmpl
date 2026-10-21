@@ -1,0 +1,20 @@
+import { StatusCodes } from 'http-status-codes'
+
+import { encode } from '{{imports.apiSrc}}/lib/codec'
+import { type RouteHandler } from '{{imports.apiSrc}}/lib/handler'
+import { getHealthApiSchema } from '{{imports.apiSrc}}/modules/health/schemas/health.api-schema'
+import {
+  type HealthService,
+  healthService,
+} from '{{imports.apiSrc}}/modules/health/services/health.service'
+
+export class HealthController {
+  constructor(private readonly healthService: HealthService) {}
+
+  getHealth: RouteHandler = () => {
+    const health = encode(getHealthApiSchema.response[StatusCodes.OK], this.healthService.getStatus())
+    return Response.json(health, { status: StatusCodes.OK })
+  }
+}
+
+export const healthController = new HealthController(healthService)

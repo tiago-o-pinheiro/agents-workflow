@@ -25,7 +25,7 @@ Packages are `tokens` and `ui`. In single layout they live at `src/design-system
 `tokens/src/theme.css` holds values as CSS variables: `:root` for light, `.dark` for overrides.
 
 - Color roles: `background`, `foreground`, `surface`, `muted`, `primary`, `primary-foreground`, `accent`, `danger`, `border`, `ring`.
-- Radius scale, spacing on a 4px base, font families, font sizes, shadows.
+- Corner (radius) scale, spacing on a 4px base, typefaces, font sizes, elevation (shadows), motion.
 - Dark mode: `.dark` class on `html`. Never `prefers-color-scheme` alone.
 
 `tokens/src/motion.ts` holds durations and easing as `as const`, for JS animations only (CSS uses the CSS variables).
@@ -44,11 +44,15 @@ export const EASING = { out: [0.16, 1, 0.3, 1] } as const;
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --radius-md: var(--radius-md);
+  --radius-md: var(--corner-md);
+  --shadow-md: var(--elevation-md);
+  --font-sans: var(--typeface-sans);
 }
 ```
 
-Result: `bg-surface`, `text-foreground`, `rounded-md`. `inline` keeps the utilities resolving to the live variable, so `.dark` works without regenerating CSS.
+Result: `bg-surface`, `text-foreground`, `rounded-md`, `shadow-md`. `inline` keeps the utilities resolving to the live variable, so `.dark` works without regenerating CSS.
+
+Token names never reuse a Tailwind theme namespace (`--radius-*`, `--shadow-*`, `--font-*`, `--color-*`), or the mapping becomes a self-reference. Tokens use `--corner-*`, `--elevation-*`, `--typeface-*`, `--motion-*` and bare color roles.
 
 ## Components
 

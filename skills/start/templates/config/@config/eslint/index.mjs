@@ -30,7 +30,8 @@ const FRAMEWORK_DEFAULT_EXPORTS = [
 const VIRTUAL_PACKAGES = ['models', 'core', 'tokens', 'ui', 'i18n', 'design-system']
 
 const normalizeDir = (dir) => (dir === '.' ? '' : dir.replace(/\/$/, ''))
-const inDir = (dir) => (dir ? `${dir}/**` : '**')
+const inDir = (dir, patterns) =>
+  patterns.map((pattern) => (dir ? `${dir}/${pattern}` : pattern))
 
 const importOrder = (scope) => ({
   groups: ['builtin', 'external', 'internal', 'unknown', ['parent', 'sibling', 'index']],
@@ -170,7 +171,7 @@ export const createEslintConfig = ({
   if (frontend === 'next') {
     blocks.push({
       name: 'dev/next',
-      files: [inDir(web)],
+      files: inDir(web, SOURCE_FILES),
       plugins: { '@next/next': nextPlugin },
       rules: {
         ...nextPlugin.configs.recommended.rules,
@@ -179,10 +180,10 @@ export const createEslintConfig = ({
     })
   }
 
-  if (api) {
+  if (apiDir) {
     blocks.push({
       name: 'dev/api-controllers-no-orm',
-      files: [`${api}/**/controllers/**/*.ts`],
+      files: inDir(api, ['**/controllers/**/*.ts']),
       rules: {
         'no-restricted-imports': [
           'error',

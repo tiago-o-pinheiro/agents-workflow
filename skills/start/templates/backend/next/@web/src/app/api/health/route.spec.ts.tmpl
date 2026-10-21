@@ -1,0 +1,15 @@
+import { StatusCodes } from 'http-status-codes'
+import { describe, expect, it } from 'vitest'
+
+import { Models } from '{{imports.models}}'
+
+import { GET } from './route'
+
+describe('GET /api/health', () => {
+  it('Given a running app, should report an ok status with uptime and timestamp', async () => {
+    const response = await GET(new Request('http://test/api/health'))
+
+    expect(response.status).toBe(StatusCodes.OK)
+    expect(Models.isHealth(await response.json())).toBe(true)
+  })
+})

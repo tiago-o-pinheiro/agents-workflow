@@ -1,0 +1,7 @@
+import { createVitestConfig } from '{{imports.config}}/vitest/index.ts'
+
+export default createVitestConfig({
+  root: import.meta.dirname,
+  environment: 'jsdom',
+  setupFiles: ['./src/test/setup.ts'],
+})

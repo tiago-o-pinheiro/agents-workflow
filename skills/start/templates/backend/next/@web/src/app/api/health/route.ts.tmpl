@@ -1,0 +1,4 @@
+import { withErrorHandler } from '{{imports.apiSrc}}/errors/with-error-handler'
+import { healthController } from '{{imports.apiSrc}}/modules/health/controllers/health.controller'
+
+export const GET = withErrorHandler(healthController.getHealth)

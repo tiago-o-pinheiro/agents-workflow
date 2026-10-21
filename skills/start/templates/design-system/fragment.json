@@ -1,0 +1,30 @@
+{
+  "deps": {
+    "@ui": ["clsx", "tailwind-merge"]
+  },
+  "devDeps": {
+    "@ui": [
+      "@testing-library/dom",
+      "@testing-library/jest-dom",
+      "@testing-library/react",
+      "@testing-library/user-event",
+      "@types/react",
+      "@types/react-dom",
+      "jsdom",
+      "react",
+      "react-dom"
+    ],
+    "@root": ["prettier-plugin-tailwindcss", "tailwindcss"]
+  },
+  "exports": {
+    "@tokens": {
+      ".": "./src/index.ts",
+      "./theme.css": "./src/theme.css",
+      "./tailwind.css": "./src/tailwind.css"
+    },
+    "@ui": {
+      ".": "./src/index.ts",
+      "./*": "./src/*/index.ts"
+    }
+  }
+}
