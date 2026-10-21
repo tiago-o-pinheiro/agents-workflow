@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="440" viewBox="0 0 1280 440" role="img" aria-label="dev, a Claude Code plugin: scaffold a TypeScript project, then ship every feature planned, gated and reviewed">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EEF2F7"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0.18" cy="0.1" r="0.55">
+      <stop offset="0" stop-color="#3B82F6" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#3B82F6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0.92" cy="0.95" r="0.45">
+      <stop offset="0" stop-color="#F97316" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#F97316" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.2" fill="#0F172A" fill-opacity="0.06"/>
+    </pattern>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#020617" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="440" rx="20" fill="url(#bg)"/>
+  <rect width="1280" height="440" rx="20" fill="url(#dots)"/>
+  <rect width="1280" height="440" rx="20" fill="url(#glowA)"/>
+  <rect width="1280" height="440" rx="20" fill="url(#glowB)"/>
+
+  <g transform="translate(72 78)">
+    <rect width="56" height="56" rx="14" fill="url(#mark)"/>
+    <path d="M17 19 L28 28 L17 37" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M31 38 H41" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+    <text x="76" y="36" font-family="'JetBrains Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" font-weight="600" letter-spacing="3" fill="#C2410C">CLAUDE CODE PLUGIN</text>
+  </g>
+  <text x="66" y="236" font-family="'JetBrains Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="104" font-weight="700" letter-spacing="-4" fill="#0F172A"><tspan fill="#2563EB">/</tspan>dev</text>
+  <text font-family="'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="24" fill="#475569">
+    <tspan x="72" y="284">Scaffold a TypeScript project, then ship</tspan>
+    <tspan x="72" y="316">every feature planned, gated and reviewed.</tspan>
+  </text>
+  
+    <g transform="translate(72 352)">
+      <rect width="126" height="32" rx="16" fill="#7C3AED" fill-opacity="0.1" stroke="#7C3AED" stroke-opacity="0.55"/>
+      <circle cx="17" cy="16" r="4.5" fill="#7C3AED"/>
+      <text x="30" y="21" font-family="'JetBrains Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" fill="#0F172A">opus plans</text>
+    </g>
+  
+    <g transform="translate(232 352)">
+      <rect width="143.2" height="32" rx="16" fill="#2563EB" fill-opacity="0.1" stroke="#2563EB" stroke-opacity="0.55"/>
+      <circle cx="17" cy="16" r="4.5" fill="#2563EB"/>
+      <text x="30" y="21" font-family="'JetBrains Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" fill="#0F172A">sonnet codes</text>
+    </g>
+  
+    <g transform="translate(410 352)">
+      <rect width="134.6" height="32" rx="16" fill="#EA580C" fill-opacity="0.1" stroke="#EA580C" stroke-opacity="0.55"/>
+      <circle cx="17" cy="16" r="4.5" fill="#EA580C"/>
+      <text x="30" y="21" font-family="'JetBrains Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="14" fill="#0F172A">fable hunts</text>
+    </g>
+
+  <g filter="url(#shadow)">
+    <rect x="668" y="70" width="548" height="312" rx="14" fill="#0B1120" stroke="#1F2937"/>
+  </g>
+  <path d="M668 84 a14 14 0 0 1 14 -14 h520 a14 14 0 0 1 14 14 v26 h-548 z" fill="#111827"/>
+  <circle cx="690" cy="90" r="5.5" fill="#F87171"/>
+  <circle cx="709" cy="90" r="5.5" fill="#FBBF24"/>
+  <circle cx="728" cy="90" r="5.5" fill="#34D399"/>
+  <text x="942" y="95" text-anchor="middle" font-family="'JetBrains Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" fill="#64748B">~/shop</text>
+  <g font-family="'JetBrains Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="16">
+    <text x="696" y="156" xml:space="preserve"><tspan fill="#64748B">$ </tspan><tspan fill="#60A5FA">/dev:start</tspan><tspan fill="#E2E8F0"> shop turbo next fastify</tspan></text>
+    <text x="696" y="184" xml:space="preserve"><tspan fill="#4ADE80">  ✓ </tspan><tspan fill="#94A3B8">scaffold  </tspan><tspan fill="#E2E8F0">125 files · pnpm + turbo</tspan></text>
+    <text x="696" y="212" xml:space="preserve"><tspan fill="#4ADE80">  ✓ </tspan><tspan fill="#94A3B8">gates     </tspan><tspan fill="#E2E8F0">typecheck  lint  test  build</tspan></text>
+    <text x="696" y="240" xml:space="preserve"></text>
+    <text x="696" y="268" xml:space="preserve"><tspan fill="#64748B">$ </tspan><tspan fill="#60A5FA">/dev:feature</tspan><tspan fill="#E2E8F0"> add a notes page</tspan></text>
+    <text x="696" y="296" xml:space="preserve"><tspan fill="#A78BFA">  planner</tspan><tspan fill="#64748B"> → </tspan><tspan fill="#60A5FA">coder ×3</tspan><tspan fill="#64748B"> → </tspan><tspan fill="#60A5FA">tester</tspan><tspan fill="#64748B"> → </tspan><tspan fill="#60A5FA">qa</tspan></text>
+    <text x="696" y="324" xml:space="preserve"><tspan fill="#64748B">  → </tspan><tspan fill="#A78BFA">senior</tspan><tspan fill="#64748B"> → </tspan><tspan fill="#FB923C">bug-hunter</tspan><tspan fill="#64748B"> → </tspan><tspan fill="#4ADE80">verify</tspan></text>
+    <text x="696" y="352" xml:space="preserve"><tspan fill="#4ADE80">  ✓ </tspan><tspan fill="#94A3B8">done      </tspan><tspan fill="#E2E8F0">22 files · 0 open findings</tspan></text>
+  </g>
+</svg>
