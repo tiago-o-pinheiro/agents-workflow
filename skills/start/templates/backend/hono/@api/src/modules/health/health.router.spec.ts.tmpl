@@ -1,0 +1,27 @@
+import { StatusCodes } from 'http-status-codes'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { Models } from '{{imports.models}}'
+
+import { createApp } from '@/app'
+
+describe('Health router', () => {
+  let app: ReturnType<typeof createApp>
+
+  beforeEach(() => {
+    app = createApp()
+  })
+
+  it('Given a running app, should report an ok status with uptime and timestamp', async () => {
+    const response = await app.request('/health')
+
+    expect(response.status).toBe(StatusCodes.OK)
+    expect(Models.isHealth(await response.json())).toBe(true)
+  })
+
+  it('Given an unknown route, should respond not found', async () => {
+    const response = await app.request('/::unknown::')
+
+    expect(response.status).toBe(StatusCodes.NOT_FOUND)
+  })
+})

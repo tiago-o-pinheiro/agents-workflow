@@ -1,0 +1,33 @@
+import { type Context, type Env } from 'hono'
+import { validator } from 'hono/validator'
+import { type StaticDecode, type TSchema } from 'typebox'
+import { Value } from 'typebox/value'
+
+import { decode } from '{{imports.apiSrc}}/lib/codec'
+
+type ApiSchema = {
+  params?: TSchema
+  query?: TSchema
+  body?: TSchema
+  response?: Record<number, TSchema>
+}
+
+type Targets = { params: 'param'; query: 'query'; body: 'json' }
+
+type Validated<Schema extends ApiSchema> = {
+  [Key in keyof Targets as Schema[Key & keyof Schema] extends TSchema
+    ? Targets[Key]
+    : never]: StaticDecode<Extract<Schema[Key & keyof Schema], TSchema>>
+}
+
+export type Handler<Schema extends ApiSchema> = (
+  context: Context<Env, string, { in: Record<never, never>; out: Validated<Schema> }>,
+) => Response | Promise<Response>
+
+export const validate = <Target extends 'param' | 'query' | 'json', Schema extends TSchema>(
+  target: Target,
+  schema: Schema,
+) =>
+  validator(target, (value) =>
+    decode(schema, target === 'json' ? value : Value.Convert(schema, Value.Default(schema, Value.Clone(value)))),
+  )

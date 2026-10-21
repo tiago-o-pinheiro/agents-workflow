@@ -1,0 +1,82 @@
+import express from 'express'
+import { StatusCodes } from 'http-status-codes'
+import request from 'supertest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { Models } from '{{imports.models}}'
+
+import { handle } from '@/lib/handler'
+
+import { errorHandler, notFoundHandler } from './error-handler'
+import { ConflictError } from './http-errors'
+
+describe('errorHandler', () => {
+  let app: express.Express
+
+  beforeEach(() => {
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
+    app = express()
+    app.use(express.json())
+    app.get('/conflict', () => {
+      throw new ConflictError('::message::', { field: '::field::' })
+    })
+    app.get('/boom', () => {
+      throw new Error('::secret::')
+    })
+    app.get(
+      '/page',
+      handle({ query: Models.PaginationQuery }, ({ query }, response) => {
+        response.json(query)
+      }),
+    )
+    app.use(notFoundHandler)
+    app.use(errorHandler)
+  })
+
+  it('Given a global error, should respond with its status and details', async () => {
+    const response = await request(app).get('/conflict')
+
+    expect(response.status).toBe(StatusCodes.CONFLICT)
+    expect(response.body).toEqual({
+      statusCode: StatusCodes.CONFLICT,
+      error: 'Conflict',
+      message: '::message::',
+      details: { field: '::field::' },
+    })
+  })
+
+  it('Given an unknown error, should respond 500 without leaking internals', async () => {
+    const response = await request(app).get('/boom')
+
+    expect(response.status).toBe(StatusCodes.INTERNAL_SERVER_ERROR)
+    expect(response.text).not.toContain('::secret::')
+  })
+
+  it('Given an unknown route, should respond not found with the error shape', async () => {
+    const response = await request(app).get('/::unknown::')
+
+    expect(response.status).toBe(StatusCodes.NOT_FOUND)
+    expect(response.body).toMatchObject({ statusCode: StatusCodes.NOT_FOUND, error: 'Not Found' })
+  })
+
+  it('Given a malformed json body, should respond with the client error status', async () => {
+    const response = await request(app)
+      .post('/::unknown::')
+      .set('content-type', 'application/json')
+      .send('{')
+
+    expect(response.status).toBe(StatusCodes.BAD_REQUEST)
+  })
+
+  it('Given a query that fails the schema, should respond unprocessable', async () => {
+    const response = await request(app).get('/page?pageSize=1000')
+
+    expect(response.status).toBe(StatusCodes.UNPROCESSABLE_ENTITY)
+  })
+
+  it('Given an empty query, should apply the schema defaults', async () => {
+    const response = await request(app).get('/page')
+
+    expect(response.body).toEqual({ page: 1, pageSize: 20 })
+  })
+})

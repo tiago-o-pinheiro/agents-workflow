@@ -1,0 +1,8 @@
+{
+  "deps": {
+    "@api": ["express", "cors", "http-status-codes"]
+  },
+  "devDeps": {
+    "@api": ["@types/express", "@types/cors", "supertest", "@types/supertest"]
+  }
+}

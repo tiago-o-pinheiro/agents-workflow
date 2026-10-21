@@ -1,0 +1,5 @@
+{
+  "deps": {
+    "@api": ["hono", "@hono/node-server", "http-status-codes"]
+  }
+}

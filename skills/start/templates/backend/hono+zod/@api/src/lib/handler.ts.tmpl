@@ -1,0 +1,34 @@
+import { zValidator } from '@hono/zod-validator'
+import { type Context, type Env } from 'hono'
+import { type z } from 'zod'
+
+import { ValidationError } from '{{imports.apiSrc}}/errors/http-errors'
+
+type ApiSchema = {
+  params?: z.ZodType
+  query?: z.ZodType
+  body?: z.ZodType
+  response?: Record<number, z.ZodType>
+}
+
+type Targets = { params: 'param'; query: 'query'; body: 'json' }
+
+type Validated<Schema extends ApiSchema> = {
+  [Key in keyof Targets as Schema[Key & keyof Schema] extends z.ZodType
+    ? Targets[Key]
+    : never]: z.output<Extract<Schema[Key & keyof Schema], z.ZodType>>
+}
+
+export type Handler<Schema extends ApiSchema> = (
+  context: Context<Env, string, { in: Record<never, never>; out: Validated<Schema> }>,
+) => Response | Promise<Response>
+
+export const validate = <Target extends 'param' | 'query' | 'json', Schema extends z.ZodType>(
+  target: Target,
+  schema: Schema,
+) =>
+  zValidator(target, schema, (result) => {
+    if (!result.success) {
+      throw new ValidationError('Validation failed', result.error.issues)
+    }
+  })

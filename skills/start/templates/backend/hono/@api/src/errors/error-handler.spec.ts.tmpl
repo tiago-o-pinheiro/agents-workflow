@@ -1,0 +1,71 @@
+import { Hono } from 'hono'
+import { StatusCodes } from 'http-status-codes'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { Models } from '{{imports.models}}'
+
+import { validate } from '@/lib/handler'
+
+import { errorHandler, notFoundHandler } from './error-handler'
+import { ConflictError } from './http-errors'
+
+describe('errorHandler', () => {
+  let app: Hono
+
+  beforeEach(() => {
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
+    app = new Hono()
+    app.onError(errorHandler)
+    app.notFound(notFoundHandler)
+    app.get('/conflict', () => {
+      throw new ConflictError('::message::', { field: '::field::' })
+    })
+    app.get('/boom', () => {
+      throw new Error('::secret::')
+    })
+    app.get('/page', validate('query', Models.PaginationQuery), (context) =>
+      context.json(context.req.valid('query')),
+    )
+  })
+
+  it('Given a global error, should respond with its status and details', async () => {
+    const response = await app.request('/conflict')
+
+    expect(response.status).toBe(StatusCodes.CONFLICT)
+    expect(await response.json()).toEqual({
+      statusCode: StatusCodes.CONFLICT,
+      error: 'Conflict',
+      message: '::message::',
+      details: { field: '::field::' },
+    })
+  })
+
+  it('Given an unknown error, should respond 500 without leaking internals', async () => {
+    const response = await app.request('/boom')
+
+    expect(response.status).toBe(StatusCodes.INTERNAL_SERVER_ERROR)
+    expect(await response.text()).not.toContain('::secret::')
+  })
+
+  it('Given an unknown route, should respond not found with the error shape', async () => {
+    const response = await app.request('/::unknown::')
+
+    expect(response.status).toBe(StatusCodes.NOT_FOUND)
+    expect(await response.json()).toMatchObject({
+      statusCode: StatusCodes.NOT_FOUND,
+      error: 'Not Found',
+    })
+  })
+
+  it('Given a query that fails the schema, should respond unprocessable', async () => {
+    const response = await app.request('/page?pageSize=1000')
+
+    expect(response.status).toBe(StatusCodes.UNPROCESSABLE_ENTITY)
+  })
+
+  it('Given an empty query, should apply the schema defaults', async () => {
+    const response = await app.request('/page')
+
+    expect(await response.json()).toEqual({ page: 1, pageSize: 20 })
+  })
+})

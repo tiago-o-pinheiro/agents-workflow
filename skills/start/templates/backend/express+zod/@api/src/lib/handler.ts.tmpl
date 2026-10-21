@@ -1,0 +1,51 @@
+import { type RequestHandler, type Response } from 'express'
+import { type z } from 'zod'
+
+import { decode } from '{{imports.apiSrc}}/lib/codec'
+
+type ApiSchema = {
+  params?: z.ZodType
+  query?: z.ZodType
+  body?: z.ZodType
+  response?: Record<number, z.ZodType>
+}
+
+type Decoded<Schema extends z.ZodType | undefined> = Schema extends z.ZodType
+  ? z.output<Schema>
+  : undefined
+
+export type HandlerInput<Schema extends ApiSchema> = {
+  params: Decoded<Schema['params']>
+  query: Decoded<Schema['query']>
+  body: Decoded<Schema['body']>
+}
+
+export type Handler<Schema extends ApiSchema> = (
+  input: HandlerInput<Schema>,
+  response: Response,
+) => void | Promise<void>
+
+const decodeOptional = (schema: z.ZodType | undefined, input: unknown): unknown =>
+  schema ? decode(schema, input) : undefined
+
+const isHandlerInput = <Schema extends ApiSchema>(
+  schema: Schema,
+  input: Record<'params' | 'query' | 'body', unknown>,
+): input is HandlerInput<Schema> =>
+  (['params', 'query', 'body'] as const).every(
+    (key) => schema[key] === undefined || input[key] !== undefined,
+  )
+
+export const handle =
+  <Schema extends ApiSchema>(schema: Schema, handler: Handler<Schema>): RequestHandler =>
+  async (request, response) => {
+    const input = {
+      params: decodeOptional(schema.params, request.params),
+      query: decodeOptional(schema.query, request.query),
+      body: decodeOptional(schema.body, request.body),
+    }
+    if (!isHandlerInput(schema, input)) {
+      throw new TypeError('Handler input does not match its api-schema')
+    }
+    await handler(input, response)
+  }
