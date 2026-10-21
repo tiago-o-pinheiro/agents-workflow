@@ -94,7 +94,7 @@ Output path rules:
 - `.tmpl` suffix: content rendered, suffix dropped. Other files copied byte for byte.
 - Later fragment wins on identical output path.
 
-Rendering: `{{dot.path}}` only, keys from section 5. Unknown key → hard error naming file and key. No conditionals, loops or escapes: variation lives in separate fragments or computed keys.
+Rendering: `{{dot.path}}` only, keys from section 5. Unknown key → hard error naming file and key. `${{ ... }}` (GitHub Actions expressions) is left untouched. No conditionals, loops or other escapes: variation lives in separate fragments or computed keys.
 
 `fragment.json` (all keys optional):
 ```json

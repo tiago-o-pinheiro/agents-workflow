@@ -1,0 +1,5 @@
+export default {
+  '*.{ts,tsx,mjs}': ['eslint --fix', 'prettier --write'],
+  '*.{json,md,css}': ['prettier --write'],
+  '*.{ts,tsx}': ['vitest related --run --passWithNoTests'],
+}

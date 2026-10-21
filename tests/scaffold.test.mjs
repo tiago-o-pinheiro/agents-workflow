@@ -385,3 +385,8 @@ describe('cli', () => {
   });
 });
 
+
+it('render leaves GitHub Actions expressions untouched', () => {
+  const output = render('${{ runner.os }}-{{project.name}}', { 'project.name': 'shop' }, 'ci.yml.tmpl');
+  assert.equal(output, '${{ runner.os }}-shop');
+});

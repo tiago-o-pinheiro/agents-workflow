@@ -298,7 +298,7 @@ const flatten = (object, prefix = '') =>
   }, {});
 
 export const render = (text, context, fileLabel) =>
-  text.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_, key) => {
+  text.replace(/(?<!\$)\{\{\s*([\w.]+)\s*\}\}/g, (_, key) => {
     if (!Object.hasOwn(context, key)) fail(`${fileLabel}: unknown template key "${key}"`);
     return context[key];
   });

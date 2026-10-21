@@ -1,0 +1,8 @@
+{
+  "devDeps": {
+    "@root": ["husky", "lint-staged", "@commitlint/cli", "@commitlint/config-conventional"]
+  },
+  "scripts": {
+    "@root": { "prepare": "husky" }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "common.retry": "Retry",
+  "common.loading": "Loading...",
+  "errors.generic": "Something went wrong. Please try again.",
+  "health.ok": "All systems operational"
+}

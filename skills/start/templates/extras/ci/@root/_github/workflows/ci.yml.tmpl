@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: {{node.version}}
+      - run: npm install --global {{pm.packageManager}}
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/pnpm/store
+            ~/.bun/install/cache
+          key: ${{ runner.os }}-{{pm.name}}-${{ hashFiles('{{pm.lockfile}}') }}
+          restore-keys: |
+            ${{ runner.os }}-{{pm.name}}-
+      - run: {{pm.install}}
+      - run: node scripts/check.mjs --full
