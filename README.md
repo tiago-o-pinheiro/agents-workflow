@@ -147,9 +147,9 @@ shop/
 |---|---|---|---|---|
 | S | coder, qa | rename a UI label (2 files) | ~1.5 min | ~$0.45 |
 | M | planner, coders, tester, qa, senior | endpoint + model + UI footer (12 files) | ~6.5 min | ~$1.35 |
-| L | M plus bug-hunter | to be measured | | |
+| L | M plus bug-hunter | notes API + page with filter, pagination, form (22 files) | ~12 min | ~$6.50 |
 
-Measured on a scaffolded Next.js app with the orchestrator on Opus and the balanced profile, no fix rounds. About 70% of the cost is the Opus orchestrator, planner and senior review; the Sonnet coders, tester and QA are the rest. Fix rounds add roughly one coder plus the verifying reviewers each.
+Measured on a scaffolded Next.js app with the orchestrator on Opus and the balanced profile, no fix rounds for S and M; the L run had two (a gate failure and two bug-hunter findings) and was interrupted and finished with `--resume`. About 70% of the cost is the Opus orchestrator, planner and senior review; the Sonnet coders, tester and QA are the rest. Fix rounds add roughly one coder plus the verifying reviewers each.
 
 ## Repo layout
 

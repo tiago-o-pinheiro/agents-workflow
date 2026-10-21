@@ -44,7 +44,7 @@ Decide from the request and the project CLAUDE.md only (do not explore code). Un
 | M | One domain or feature: endpoint + UI, new component set, refactor in one area |
 | L | Crosses packages, data model, auth or security, public contracts, anything risky |
 
-The planner names a recommended tier in plan.md (`Tier:` line). If it differs, apply it: `RUN_JS set tier=X maxRounds=N` (N from the context loops line: S/M/L).
+The planner names a recommended tier in plan.md (`Tier:` line). If it differs and the user did not pass `--tier`, apply it: `RUN_JS set tier=X maxRounds=N` (N from the context loops line: S/M/L). A tier the user passed always stands.
 
 ## Spawning
 
