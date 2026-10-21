@@ -162,12 +162,19 @@ export const extractExports = (source) => {
   return [...new Set(names)];
 };
 
+const SCOPE_CONTAINERS = new Set(['src', 'server', 'app', 'api', 'features', 'modules']);
+
+const scopeOf = (file) => {
+  const parts = file.split('/');
+  if (['packages', 'apps'].includes(parts[0]) && parts.length > 2) return parts[1];
+  return parts.slice(0, -1).find((part) => !SCOPE_CONTAINERS.has(part)) ?? '';
+};
+
 export const topScope = (files) => {
   const counts = new Map();
   for (const file of files) {
-    const parts = file.split('/');
-    if (parts.length < 2) continue;
-    const key = ['packages', 'apps'].includes(parts[0]) && parts.length > 2 ? parts[1] : parts[0];
+    const key = scopeOf(file);
+    if (!key) continue;
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
   return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';

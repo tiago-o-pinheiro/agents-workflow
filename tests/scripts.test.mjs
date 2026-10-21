@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { detectPm, filterOutput, stripAnsi } from '../skills/feature/scripts/check.mjs';
-import { applyGates, parseFindings, slugify } from '../skills/feature/scripts/run.mjs';
+import { applyGates, parseFindings, slugify, topScope } from '../skills/feature/scripts/run.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CHECK = join(ROOT, 'skills/feature/scripts/check.mjs');
@@ -141,9 +141,16 @@ test('run: init, snapshot, fix.patch, set, log, findings, finish', () => {
   assert.ok(refs().includes(`refs/dev/${id}/head`));
   const fin = node(RUN, ['finish'], dir);
   assert.equal(fin.status, 0, fin.stderr);
-  assert.match(fin.stdout, /scope: src/);
+  assert.match(fin.stdout, /scope: \(none\)/);
   assert.equal(refs(), '');
   assert.equal(state().phase, 'done');
+});
+
+test('run: topScope names the package in a monorepo and the domain in a single app', () => {
+  assert.equal(topScope(['apps/web/src/features/health/a.tsx', 'apps/web/src/b.ts', 'packages/ui/src/c.ts']), 'web');
+  assert.equal(topScope(['src/features/health/components/a.tsx', 'src/features/health/a.spec.tsx']), 'health');
+  assert.equal(topScope(['src/server/modules/notes/services/a.ts', 'src/app/api/notes/route.ts']), 'notes');
+  assert.equal(topScope(['src/a.ts', 'package.json']), '');
 });
 
 test('run: check adds then verifies GATE entries', () => {
