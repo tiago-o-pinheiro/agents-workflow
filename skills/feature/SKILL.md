@@ -108,8 +108,9 @@ Gates always run before qa, senior-reviewer, or bug-hunter. An open GATE finding
 2. `RUN_JS set phase=code`; spawn coder (`MODE: task`, `SCOPE: all`, it writes its own specs).
 3. `RUN_JS check`; `RUN_JS snapshot`.
 4. `set phase=qa`; spawn qa (`MODE: review`).
-5. Fix rounds (cap `maxRounds`, normally 2).
-6. Finish.
+5. The request touches auth, security, persistence or a public contract (triage would say L, but the user forced S): also spawn senior-reviewer (`MODE: review`) after qa, and tell the user in one line why.
+6. Fix rounds (cap `maxRounds`, normally 2).
+7. Finish.
 
 ### Tier M
 

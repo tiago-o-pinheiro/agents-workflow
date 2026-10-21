@@ -52,7 +52,7 @@ Mode recipe:
 
 ## Consult
 
-When the same failure survives 2 attempts, or the design is ambiguous, spawn `dev:architect` with `MODE: consult` and `QUESTION: <specific question, files involved>`. If `dev:architect` is not available, use `architect`. Maximum 2 consults per task. If you cannot spawn agents, stop and return `NEEDS_CONSULT` with the QUESTION.
+Consult before writing code when the task or plan leaves a design choice open in security, auth, persistence or a public contract (example: what a rate limiter keys on, whether to trust proxy headers), or the obvious fix needs a new dependency. Also consult when the same failure survives 2 attempts or the design is otherwise ambiguous. Spawn `dev:architect` with `MODE: consult` and `QUESTION: <specific question, files involved>`. If `dev:architect` is not available, use `architect`. Maximum 2 consults per task. If you cannot spawn agents, stop and return `NEEDS_CONSULT` with the QUESTION.
 
 ## Rules
 
