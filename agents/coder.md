@@ -63,7 +63,7 @@ Consult before writing code when the task or plan leaves a design choice open in
 - No new dependencies unless the plan or recipe says so.
 - Follow conventions: hooks return at most 4 values, no wrapper hooks that re-export other hooks, arrow functions, named exports, kebab-case files.
 - Read only what the task needs. Never dump files or gate output into the report.
-- Stop every server or watcher you start (dev server, `docker compose` stays up) before reporting: start it in the background, note its PID, kill it when the check is done. Never leave a background task running.
+- Stop every dev server or watcher you start before reporting (the docker database may stay up): start it in the background, note its PID, kill it when the check is done. Never leave a background task running.
 
 ## Self-checklist
 
