@@ -20,7 +20,7 @@ A Claude Code plugin that scaffolds TypeScript projects and ships features throu
 /plugin install dev@tiago-devkit
 ```
 
-Update with `/plugin marketplace update tiago-devkit`. Commands are namespaced: `/dev:start`, `/dev:feature`, `/dev:adopt`.
+Update with `/plugin marketplace update tiago-devkit`. Commands are namespaced: `/dev:start`, `/dev:feature`, `/dev:adopt`. The bare form (`/start`) also works while no other skill uses the same name. The plugin adds about 500 tokens to every session; the rest loads only when a command or agent runs.
 
 ### B. Script
 

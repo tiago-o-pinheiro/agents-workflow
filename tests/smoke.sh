@@ -34,16 +34,15 @@ else
   SMOKE_DIR="$(mktemp -d)"
 fi
 
+WEB_PORT="${SMOKE_WEB_PORT:-3000}"
+API_PORT="${SMOKE_API_PORT:-3001}"
 SERVER_PID=""
+SERVER_PORT=""
 RESULTS=()
 FAILED=0
 
-free_ports() {
-  local port pids
-  for port in 3000 3001; do
-    pids="$(lsof -ti "tcp:$port" 2>/dev/null || true)"
-    [ -n "$pids" ] && kill $pids 2>/dev/null || true
-  done
+listeners() {
+  lsof -ti "tcp:$1" -sTCP:LISTEN 2>/dev/null || true
 }
 
 stop_server() {
@@ -52,7 +51,12 @@ stop_server() {
     wait "$SERVER_PID" 2>/dev/null || true
     SERVER_PID=""
   fi
-  free_ports
+  if [ -n "$SERVER_PORT" ]; then
+    local pids
+    pids="$(listeners "$SERVER_PORT")"
+    [ -n "$pids" ] && kill $pids 2>/dev/null || true
+    SERVER_PORT=""
+  fi
   sleep 1
 }
 
@@ -81,11 +85,15 @@ wait_for() {
 }
 
 serve_check() {
-  local dir="$1" log="$2" url="$3"
-  shift 3
-  free_ports
+  local dir="$1" log="$2" port="$3" url="$4"
+  shift 4
+  if [ -n "$(listeners "$port")" ]; then
+    echo "port $port is busy; set SMOKE_WEB_PORT / SMOKE_API_PORT" >&2
+    return 1
+  fi
   (cd "$dir" && "$@" >"$log" 2>&1) &
   SERVER_PID=$!
+  SERVER_PORT="$port"
   local ok=0
   wait_for "$url" && ok=1
   [ "$ok" -eq 0 ] && tail -n 20 "$log" >&2 || true
@@ -122,7 +130,7 @@ run_combo() {
 
   local log="$SMOKE_DIR/$name.server.log" result="PASS"
   if [ "$frontend" = "next" ] && [ "$backend" = "next" ]; then
-    serve_check "$dir" "$log" "http://localhost:3000/api/health" "$pm" exec next start -p 3000 || result="FAIL"
+    serve_check "$dir" "$log" "$WEB_PORT" "http://localhost:$WEB_PORT/api/health" "$pm" exec next start -p "$WEB_PORT" || result="FAIL"
     record "$name" serve "$result"
   elif [ "$backend" != "none" ]; then
     local cmd=()
@@ -133,7 +141,7 @@ run_combo() {
     else
       cmd=(bun run --filter "$scope/api" start)
     fi
-    serve_check "$dir" "$log" "http://localhost:3001/health" "${cmd[@]}" || result="FAIL"
+    serve_check "$dir" "$log" "$API_PORT" "http://localhost:$API_PORT/health" env PORT="$API_PORT" "${cmd[@]}" || result="FAIL"
     record "$name" serve "$result"
   fi
 }
