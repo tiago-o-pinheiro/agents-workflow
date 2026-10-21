@@ -164,11 +164,25 @@ CLI: `node scaffold.mjs --answers <file|json> --target <dir> [--dry-run] [--over
 
 ## 9. Generated project conventions (tooling)
 
-- One root `eslint.config.mjs` (from `base`) calling `createEslintConfig()` from the config package; packages run `eslint .` and ESLint resolves the root config by walking up. The factory receives `paths.*` and `answers.frontend`, and scopes React rules to `*.tsx`, Next rules to `paths.web`, and the raw `process.env` ban to everything except `paths.envFile` and config files.
-- Vitest: `@config/vitest/index.ts` exports `createVitestConfig(env)` with env `node | react`. Each monorepo package has `vitest.config.ts`; the root has `test.projects` in monorepo, a single config in single layout.
-- TypeScript: `@config/tsconfig/{base,node,react,next}.json`. Each monorepo package has `tsconfig.json` extending one; single root `tsconfig.json` extends `tsconfig.preset` with `paths: { "@/*": ["./src/*"] }`.
-- Who writes per-package files (`tsconfig.json`, `vitest.config.ts`, `tsup.config.ts`, `next.config.ts`, `vite.config.ts`): the fragment that owns the target. `@models` → validation-*, `@core` → core, `@tokens` `@ui` → design-system, `@web` → frontend-*, `@api` → backend-<fw>, `@i18n` → extras-i18n, `@config` → config, root → base and layout-*.
-- Every generated project must pass `typecheck`, `lint`, `test`, `build` right after scaffold, before any recipe.
+- Config package exports `{ "./*": "./*" }`. Every file that sits at a package root (or the single-app root) imports config by full file path through `{{imports.config}}`: `{{imports.config}}/eslint/index.mjs`, `{{imports.config}}/vitest/index.ts`, `"extends": "{{imports.config}}/tsconfig/next.json"`. This resolves to `@scope/config/...` in a monorepo and `./config/...` in a single app.
+- ESLint: one root `eslint.config.mjs` (base fragment) calls `createEslintConfig({ frontend, webDir, apiDir, envFile })` with `answers.frontend` and `paths.*`. Packages run `eslint .`; ESLint 10 resolves the root config by walking up. React rules apply to `*.tsx`; Next rules to `webDir`; the raw `process.env` ban applies everywhere except `envFile` and `*.config.*`.
+- Vitest: `{{imports.config}}/vitest/index.ts` exports `createVitestConfig({ root, environment, setupFiles, plugins })`. `root` is required and drives the `@` alias (`<root>/src`). Every package that has tests owns a `vitest.config.ts`. In a single app that is the deployable's config at the root. In a monorepo the root `vitest.config.ts` (layout-workspace) only lists `test.projects`. Tests import from `vitest` explicitly; there are no globals.
+- TypeScript 6 (`~6.0`, capped by typescript-eslint): presets `{{imports.config}}/tsconfig/{base,node,react,next}.json`. No `baseUrl`, since TS 6 deprecated it. Set `types` explicitly, since TS 6 defaults it to `[]`. Every package owns its `tsconfig.json`. App tsconfigs add `paths: { "@/*": ["./src/*"] }`.
+- Root files of a single app are owned by the deployable fragment, which writes them to its target root: frontend-next or frontend-vite (`@web/...`) and backend-<fw> (`@api/...` for API-only). backend-next never writes package-root files.
+- Which fragment writes the per-package files (`tsconfig.json`, `vitest.config.ts`, `tsup.config.ts.tmpl`, `next.config.ts`, `vite.config.ts`, `.env.example`):
+
+| Target | Owning fragment |
+|---|---|
+| `@models` | validation-* |
+| `@core` | core |
+| `@tokens`, `@ui` | design-system |
+| `@web` | frontend-* |
+| `@api` | backend-<fw> |
+| `@i18n` | extras-i18n |
+| `@config` | config |
+| root | base, layout-* |
+
+- Every generated project must pass `typecheck`, `lint`, `test` and `build` right after scaffold, before any recipe runs.
 - TypeBox means the `typebox` package (1.x): `import { Type, type Static } from 'typebox'`, `import { Value } from 'typebox/value'`.
 
 ## 10. Pipeline

@@ -25,6 +25,7 @@ Shared contract for the `feature` orchestrator, `run.mjs`, and every agent.
 | `plan.md` | planner (tiers M, L) | Plan (template in `agents/planner.md`) |
 | `findings.md` | gate, tester, qa, senior-reviewer, bug-hunter add; coder marks fixed | Ledger (section 4) |
 | `diff.patch` | `run.mjs snapshot` | Change since run start, lockfiles excluded |
+| `fix.patch` | `run.mjs snapshot` | Change since the previous snapshot (what the last fix round did); verify mode reads this |
 | `gates.log` | `run.mjs check` | Last filtered gate output |
 | `summary.md` | orchestrator at finish | ≤40 lines |
 
@@ -60,7 +61,7 @@ Invoked as `node <skill dir>/scripts/run.mjs <cmd>` from the project root. Every
 |---|---|
 | `context` | Config summary (profile, loops), active run (id, tier, phase, round, open blocker/major count), learnings line count, `git status --short` count |
 | `init "<request>" [--tier S\|M\|L] [--profile p]` | Create the run folder, `state.json`, empty ledger, base snapshot. Prints the run id and folder |
-| `snapshot [--run id]` | Snapshot the working tree into `refs/dev/<id>/head`, write `diff.patch` (base..head), print the diffstat |
+| `snapshot [--run id]` | Move the old head ref to `refs/dev/<id>/prev`, snapshot the working tree into `refs/dev/<id>/head`, write `diff.patch` (base..head) and `fix.patch` (prev..head), print the diffstat |
 | `check [--run id] [--full] [--files a b]` | Run `scripts/check.mjs` (falls back to the plugin copy). On failure add or reopen one `GATE-n` per failing gate; on success mark open GATE findings `verified`. Writes `gates.log` |
 | `set key=value ...` | Update `phase`, `tier`, `round`, `maxRounds`, `profile`, `consults` |
 | `log <agent> <STATUS> "<note>"` | Append to `history` |
@@ -145,7 +146,7 @@ Gates always run before qa, senior-reviewer, or bug-hunter. An open GATE finding
 
 ## 7. Fix rounds and escalation
 
-- A round: fresh coder in fix mode with only the open blocker/major IDs → `check` → `snapshot` → only the agents that raised those IDs re-run in verify mode. Full senior re-review only if the fix touched contracts in `plan.md`.
+- A round: fresh coder in fix mode with only the open blocker/major IDs → `check` → `snapshot` → only the agents that raised those IDs re-run in verify mode, reading `fix.patch`. Full senior re-review only if the fix touched contracts in `plan.md`.
 - `round` increments per round. On the last allowed round the coder runs with `model: opus`.
 - Still open after the last round → ask the user: `2 more rounds` | `Accept with known issues` | `Stop and keep changes`.
 - Coder consults: the coder may spawn `architect` (≤2 per task). If it cannot spawn, it returns `NEEDS_CONSULT`; the orchestrator runs `architect` with the question and resumes the coder with SendMessage (or a fresh coder with the answer). Count in `consults`.

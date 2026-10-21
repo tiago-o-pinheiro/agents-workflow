@@ -56,7 +56,7 @@ docs/architecture.md   contracts
 
 ```
 node scripts/validate-repo.mjs
-node --test tests/
+node --test tests/*.test.mjs
 claude plugin validate .   (only the two "no version" warnings are expected: versionless = every push is an update)
 ```
 
