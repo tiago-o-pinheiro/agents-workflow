@@ -7,6 +7,7 @@ type CreateVitestConfigOptions = {
   environment?: VitestEnvironment
   setupFiles?: readonly string[]
   plugins?: ViteUserConfig['plugins']
+  inlineDeps?: readonly string[]
 }
 
 export const createVitestConfig = ({
@@ -14,6 +15,7 @@ export const createVitestConfig = ({
   environment = 'node',
   setupFiles = [],
   plugins = [],
+  inlineDeps = [],
 }: CreateVitestConfigOptions) =>
   defineConfig({
     plugins,
@@ -25,6 +27,7 @@ export const createVitestConfig = ({
       setupFiles: [...setupFiles],
       include: ['src/**/*.spec.{ts,tsx}'],
       restoreMocks: true,
+      ...(inlineDeps.length > 0 ? { server: { deps: { inline: [...inlineDeps] } } } : {}),
       coverage: {
         provider: 'v8',
         reporter: ['text-summary', 'lcov'],

@@ -22,6 +22,7 @@ const TS_FILES = ['**/*.{ts,tsx,mts,cts}']
 const SOURCE_FILES = ['**/*.{js,mjs,cjs,ts,tsx,mts,cts}']
 const HOOK_FILES = ['**/*.tsx', '**/hooks/**/*.ts', '**/use-*.ts']
 const CONFIG_FILES = ['**/*.config.*', 'eslint.config.mjs']
+const PUBLIC_ENV_FILE = 'src/config/public-env.ts'
 const FRAMEWORK_DEFAULT_EXPORTS = [
   '**/app/**/{page,layout,error,not-found,loading,global-error,template,default}.tsx',
   '**/app/**/{sitemap,robots,manifest}.ts',
@@ -138,7 +139,11 @@ export const createEslintConfig = ({
     {
       name: 'dev/no-raw-process-env',
       files: TS_FILES,
-      ignores: [...CONFIG_FILES, ...(envFile ? [envFile] : [])],
+      ignores: [
+        ...CONFIG_FILES,
+        ...(envFile ? [envFile] : []),
+        ...(hasFrontend ? inDir(web, [PUBLIC_ENV_FILE]) : []),
+      ],
       rules: {
         'no-restricted-properties': [
           'error',

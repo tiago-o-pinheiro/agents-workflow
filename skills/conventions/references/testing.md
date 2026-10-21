@@ -15,7 +15,7 @@ Vitest everywhere. Tags: `[lint]` enforced by ESLint, `[review]` enforced by rev
 
 ## Setup and placement
 
-- Config comes from the config package factory: `createVitestConfig('node')` for backend and packages, `createVitestConfig('react')` for UI. Never hand-roll a vitest config. [review]
+- Config comes from the config package factory: `createVitestConfig({ root: import.meta.dirname })` for backend and packages, plus `environment: 'jsdom'` and `setupFiles` for UI. Never hand-roll a vitest config. [review]
 - Specs are colocated next to the source: `notes.service.ts` -> `notes.service.spec.ts`. React: `.spec.tsx`. [lint]
 
 ## Naming
