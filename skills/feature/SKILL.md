@@ -10,7 +10,7 @@ allowed-tools: Read, Write, Edit, AskUserQuestion, Agent, SendMessage, Bash(node
 
 Pipeline state: !`node "${CLAUDE_SKILL_DIR}/scripts/run.mjs" context`
 
-`RUN_JS = node "${CLAUDE_SKILL_DIR}/scripts/run.mjs"`. Use it for every pipeline command below. Full contract (run folder, state, ledger, report block, tiers, fix rounds): [references/protocol.md](references/protocol.md).
+`RUN_JS` below is shorthand for `node "${CLAUDE_SKILL_DIR}/scripts/run.mjs"`: type that full command every time, never a shell variable (permission checks reject a command held in a variable). Full contract (run folder, state, ledger, report block, tiers, fix rounds): [references/protocol.md](references/protocol.md).
 
 ## Role
 

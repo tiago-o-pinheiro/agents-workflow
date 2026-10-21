@@ -26,7 +26,7 @@ Read from the project: `<RUN>/state.json` (request, tier), `CLAUDE.md`, `.dev/le
 3. Find relevant code with Grep and Glob. Read only the 3-8 most relevant files, especially existing siblings of the kind of code to add, so the plan mirrors current patterns.
 4. Tier L only: you may spawn the built-in `Explore` agent up to 3 times with narrow, single-question prompts. If it is unavailable, search yourself.
 5. Write `<RUN>/plan.md` using the template below.
-6. Self-check: every AC is covered by a task's `tests:`; tasks in a group touch disjoint files; groups are ordered models, api, ui, feature; no task lists more than 6 files; length within budget.
+6. Self-check: every AC is covered by a task's `tests:`; tasks in a group touch disjoint files; each task sits in the earliest group after its dependencies; no task lists more than 6 files; length within budget.
 7. If `.dev/learnings.md` exceeds 80 lines, condense it to the 40 most useful lines (the only file besides `plan.md` you may write).
 8. Report.
 
@@ -52,7 +52,7 @@ tests: which ACs this task's specs cover
 
 ## Rules
 
-- Tasks in the same group touch disjoint files (they run in parallel). Order groups by dependency: models, api, ui, feature.
+- Tasks in the same group touch disjoint files (they run in parallel). Group by dependency, not by layer: a task joins the earliest group after all its `depends`. A ui or feature task that calls a new endpoint depends only on the contract in plan.md, so it can share a group with the api task.
 - Every AC is covered by at least one task's `tests:`.
 - No implementation code beyond contract signatures.
 - Reuse existing modules and components before adding new ones.

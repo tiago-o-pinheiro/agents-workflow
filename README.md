@@ -143,11 +143,13 @@ shop/
 
 ## Cost per tier
 
-| Tier | Typical flow | Tokens | Cost |
-|---|---|---|---|
-| S | coder, qa | to be measured | to be measured |
-| M | planner, coders, tester, qa, senior | to be measured | to be measured |
-| L | M plus bug-hunter | to be measured | to be measured |
+| Tier | Typical flow | Example | Time | Cost |
+|---|---|---|---|---|
+| S | coder, qa | rename a UI label (2 files) | ~1.5 min | ~$0.45 |
+| M | planner, coders, tester, qa, senior | endpoint + model + UI footer (12 files) | ~6.5 min | ~$1.35 |
+| L | M plus bug-hunter | to be measured | | |
+
+Measured on a scaffolded Next.js app with the orchestrator on Opus and the balanced profile, no fix rounds. About 70% of the cost is the Opus orchestrator, planner and senior review; the Sonnet coders, tester and QA are the rest. Fix rounds add roughly one coder plus the verifying reviewers each.
 
 ## Repo layout
 
