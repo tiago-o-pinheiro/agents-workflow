@@ -1,0 +1,8 @@
+import { PageShell } from '@/components/page-shell'
+import { HealthStatus } from '@/features/health/components/health-status'
+
+export const HomePage = () => (
+  <PageShell title="{{project.title}}" description="Your app is running. Start building from here.">
+    <HealthStatus />
+  </PageShell>
+)

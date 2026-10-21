@@ -1,0 +1,20 @@
+{
+  "deps": {
+    "@web": ["react", "react-dom", "react-router"]
+  },
+  "devDeps": {
+    "@web": [
+      "@tailwindcss/vite",
+      "@testing-library/dom",
+      "@testing-library/jest-dom",
+      "@testing-library/react",
+      "@testing-library/user-event",
+      "@types/react",
+      "@types/react-dom",
+      "@vitejs/plugin-react",
+      "jsdom",
+      "tailwindcss",
+      "vite"
+    ]
+  }
+}

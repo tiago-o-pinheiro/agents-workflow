@@ -5,35 +5,32 @@ import { useEffect, useState } from 'react'
 import { Button } from '{{imports.ui}}/button'
 import { Skeleton } from '{{imports.ui}}/skeleton'
 
-import { API_URL } from '@/lib/api-url'
+import { getHealth } from '../api/get-health'
 
 type HealthPhase = 'loading' | 'ok' | 'error'
-
-const fetchHealth = async (signal: AbortSignal): Promise<void> => {
-  const response = await fetch(`${API_URL}/health`, { signal })
-  if (!response.ok) {
-    throw new Error(`Health check failed with status ${response.status}`)
-  }
-}
 
 const useHealth = () => {
   const [phase, setPhase] = useState<HealthPhase>('loading')
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    const controller = new AbortController()
+    let active = true
     const check = async () => {
       try {
-        await fetchHealth(controller.signal)
-        setPhase('ok')
+        await getHealth()
+        if (active) {
+          setPhase('ok')
+        }
       } catch {
-        if (!controller.signal.aborted) {
+        if (active) {
           setPhase('error')
         }
       }
     }
     void check()
-    return () => controller.abort()
+    return () => {
+      active = false
+    }
   }, [attempt])
 
   const refetch = () => {

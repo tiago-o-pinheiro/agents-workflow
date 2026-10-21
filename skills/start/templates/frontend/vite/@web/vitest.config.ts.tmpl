@@ -1,0 +1,10 @@
+import react from '@vitejs/plugin-react'
+
+import { createVitestConfig } from '{{imports.config}}/vitest/index.ts'
+
+export default createVitestConfig({
+  root: import.meta.dirname,
+  environment: 'jsdom',
+  setupFiles: ['./src/test/setup.ts'],
+  plugins: [react()],
+})

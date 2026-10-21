@@ -1,0 +1,13 @@
+import { ApiError, type Decoder } from '{{imports.core}}'
+import { Models } from '{{imports.models}}'
+
+import { apiClient } from '@/lib/api-client'
+
+const decodeHealth: Decoder<Models.Health> = (raw) => {
+  if (!Models.isHealth(raw)) {
+    throw new ApiError('Health check returned an unexpected body', 0, raw)
+  }
+  return raw
+}
+
+export const getHealth = (): Promise<Models.Health> => apiClient.get('/health', decodeHealth)
