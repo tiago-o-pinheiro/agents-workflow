@@ -1,0 +1,75 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node scripts/validate-repo.mjs
+      - run: node --test tests/*.test.mjs
+
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      start: ${{ steps.filter.outputs.start }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: filter
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.sha }}
+        run: |
+          if [ "$EVENT" = "schedule" ] || [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "start=true" >> "$GITHUB_OUTPUT"
+          elif [ -n "$BASE" ] && ! echo "$BASE" | grep -q '^0*$' && git diff --name-only "$BASE" "$HEAD" 2>/dev/null | grep -q '^skills/start/'; then
+            echo "start=true" >> "$GITHUB_OUTPUT"
+          elif [ -z "$BASE" ] || echo "$BASE" | grep -q '^0*$'; then
+            echo "start=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "start=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  smoke:
+    needs: changes
+    if: needs.changes.outputs.start == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        combo:
+          - single-fastify-typebox
+          - single-hono-typebox
+          - single-express-zod
+          - single-next-typebox
+          - single-next-zod
+          - single-vite
+          - turbo-next-fastify-typebox
+          - turbo-vite-hono-zod
+          - bun-next-express-typebox
+          - bun-vite-fastify-zod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable pnpm
+      - uses: oven-sh/setup-bun@v2
+      - run: tests/smoke.sh ${{ matrix.combo }}
