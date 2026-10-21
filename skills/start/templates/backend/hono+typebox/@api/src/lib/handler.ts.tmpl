@@ -1,9 +1,8 @@
 import { type Context, type Env } from 'hono'
 import { validator } from 'hono/validator'
 import { type StaticDecode, type TSchema } from 'typebox'
-import { Value } from 'typebox/value'
 
-import { decode } from '{{imports.apiSrc}}/lib/codec'
+import { coerce, decode } from '{{imports.apiSrc}}/lib/codec'
 
 type ApiSchema = {
   params?: TSchema
@@ -29,5 +28,5 @@ export const validate = <Target extends 'param' | 'query' | 'json', Schema exten
   schema: Schema,
 ) =>
   validator(target, (value) =>
-    decode(schema, target === 'json' ? value : Value.Convert(schema, Value.Default(schema, Value.Clone(value)))),
+    decode(schema, target === 'json' ? value : coerce(schema, value)),
   )

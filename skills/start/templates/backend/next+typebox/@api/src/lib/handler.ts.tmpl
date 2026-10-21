@@ -1,7 +1,7 @@
 import { type TSchema } from 'typebox'
 
 import { ValidationError } from '{{imports.apiSrc}}/errors/http-errors'
-import { decode } from '{{imports.apiSrc}}/lib/codec'
+import { coerce, decode } from '{{imports.apiSrc}}/lib/codec'
 
 export type RouteContext = {
   params: Promise<Record<string, string | string[] | undefined>>
@@ -15,10 +15,10 @@ export type RouteHandler = (
 export const readParams = async <Schema extends TSchema>(
   schema: Schema,
   context: RouteContext | undefined,
-) => decode(schema, await context?.params)
+) => decode(schema, coerce(schema, await context?.params))
 
 export const readQuery = <Schema extends TSchema>(schema: Schema, request: Request) =>
-  decode(schema, Object.fromEntries(new URL(request.url).searchParams))
+  decode(schema, coerce(schema, Object.fromEntries(new URL(request.url).searchParams)))
 
 export const readBody = async <Schema extends TSchema>(schema: Schema, request: Request) => {
   const body: unknown = await request.json().catch(() => {

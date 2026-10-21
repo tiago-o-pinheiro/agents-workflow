@@ -1,8 +1,7 @@
 import { type RequestHandler, type Response } from 'express'
 import { type StaticDecode, type TSchema } from 'typebox'
-import { Value } from 'typebox/value'
 
-import { decode } from '{{imports.apiSrc}}/lib/codec'
+import { coerce as coerceInput, decode } from '{{imports.apiSrc}}/lib/codec'
 
 type ApiSchema = {
   params?: TSchema
@@ -30,7 +29,7 @@ const decodeOptional = (schema: TSchema | undefined, input: unknown, coerce: boo
   if (!schema) {
     return undefined
   }
-  return decode(schema, coerce ? Value.Convert(schema, Value.Default(schema, Value.Clone(input))) : input)
+  return decode(schema, coerce ? coerceInput(schema, input) : input)
 }
 
 const isHandlerInput = <Schema extends ApiSchema>(

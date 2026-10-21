@@ -12,3 +12,23 @@ export const decode = <Schema extends TSchema>(schema: Schema, input: unknown) =
 
 export const encode = <Schema extends TSchema>(schema: Schema, value: unknown) =>
   Value.Encode(schema, value)
+
+const PLAIN_NUMBER = /^-?\d+(\.\d+)?$/
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const isLossy = (raw: unknown, converted: unknown) =>
+  typeof raw === 'string' &&
+  typeof converted === 'number' &&
+  !(PLAIN_NUMBER.test(raw) && Number(raw) === converted)
+
+export const coerce = (schema: TSchema, input: unknown): unknown => {
+  const converted = Value.Convert(schema, Value.Default(schema, Value.Clone(input)))
+  if (!isRecord(input) || !isRecord(converted)) {
+    return converted
+  }
+  return Object.fromEntries(
+    Object.entries(converted).map(([key, value]) => [key, isLossy(input[key], value) ? input[key] : value]),
+  )
+}
