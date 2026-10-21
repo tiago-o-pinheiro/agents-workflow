@@ -1,0 +1,128 @@
+{
+  "$comment": "Fragment registry for scaffold.mjs. Contract documented in docs/architecture.md. Order of the array is the apply order; a later fragment wins when two write the same output path.",
+  "fragments": [
+    { "id": "base", "dir": "base", "when": {} },
+    { "id": "config", "dir": "config", "when": {} },
+    { "id": "layout-single", "dir": "layout/single", "when": { "layout": ["single"] } },
+    { "id": "layout-workspace", "dir": "layout/workspace", "when": { "layout": ["turbo", "bun"] } },
+    { "id": "layout-turbo", "dir": "layout/turbo", "when": { "layout": ["turbo"] } },
+    { "id": "validation-typebox", "dir": "validation/typebox", "when": { "validation": ["typebox"] } },
+    { "id": "validation-zod", "dir": "validation/zod", "when": { "validation": ["zod"] } },
+    { "id": "design-system", "dir": "design-system", "when": { "frontend": ["next", "vite"] } },
+    { "id": "core", "dir": "core", "when": { "frontend": ["next", "vite"], "backend": ["fastify", "hono", "express"] } },
+    { "id": "frontend-next", "dir": "frontend/next", "when": { "frontend": ["next"] } },
+    { "id": "frontend-vite", "dir": "frontend/vite", "when": { "frontend": ["vite"] } },
+    { "id": "backend-common", "dir": "backend/common", "when": { "backend": ["next", "fastify", "hono", "express"] } },
+    { "id": "backend-next", "dir": "backend/next", "when": { "backend": ["next"] } },
+    { "id": "backend-fastify", "dir": "backend/fastify", "when": { "backend": ["fastify"] } },
+    { "id": "backend-hono", "dir": "backend/hono", "when": { "backend": ["hono"] } },
+    { "id": "backend-express", "dir": "backend/express", "when": { "backend": ["express"] } },
+    { "id": "backend-next+typebox", "dir": "backend/next+typebox", "when": { "backend": ["next"], "validation": ["typebox"] } },
+    { "id": "backend-next+zod", "dir": "backend/next+zod", "when": { "backend": ["next"], "validation": ["zod"] } },
+    { "id": "backend-fastify+typebox", "dir": "backend/fastify+typebox", "when": { "backend": ["fastify"], "validation": ["typebox"] } },
+    { "id": "backend-fastify+zod", "dir": "backend/fastify+zod", "when": { "backend": ["fastify"], "validation": ["zod"] } },
+    { "id": "backend-hono+typebox", "dir": "backend/hono+typebox", "when": { "backend": ["hono"], "validation": ["typebox"] } },
+    { "id": "backend-hono+zod", "dir": "backend/hono+zod", "when": { "backend": ["hono"], "validation": ["zod"] } },
+    { "id": "backend-express+typebox", "dir": "backend/express+typebox", "when": { "backend": ["express"], "validation": ["typebox"] } },
+    { "id": "backend-express+zod", "dir": "backend/express+zod", "when": { "backend": ["express"], "validation": ["zod"] } },
+    { "id": "extras-i18n", "dir": "extras/i18n", "when": { "extras": ["i18n"] } },
+    { "id": "extras-git-hooks", "dir": "extras/git-hooks", "when": { "extras": ["git-hooks"] } },
+    { "id": "extras-ci", "dir": "extras/ci", "when": { "extras": ["ci"] } },
+    { "id": "extras-claude-hooks", "dir": "extras/claude-hooks", "when": { "extras": ["claude-hooks"] } }
+  ],
+  "packages": {
+    "@web": { "name": "web", "kind": "web-{{answers.frontend}}" },
+    "@api": { "name": "api", "kind": "api-node" },
+    "@models": { "name": "models", "kind": "lib" },
+    "@core": { "name": "core", "kind": "lib" },
+    "@tokens": { "name": "tokens", "kind": "lib" },
+    "@ui": { "name": "ui", "kind": "lib" },
+    "@i18n": { "name": "i18n", "kind": "lib" },
+    "@config": { "name": "config", "kind": "config" }
+  },
+  "internalDeps": {
+    "@web": ["@ui", "@tokens", "@models", "@core", "@i18n"],
+    "@api": ["@models", "@i18n"],
+    "@core": ["@models"],
+    "@ui": ["@tokens"],
+    "@models": [],
+    "@tokens": [],
+    "@i18n": []
+  },
+  "kindDevDeps": {
+    "web-next": ["typescript", "eslint", "vitest", "@vitest/coverage-v8", "@types/node"],
+    "web-vite": ["typescript", "eslint", "vitest", "@vitest/coverage-v8", "@types/node"],
+    "api-node": ["typescript", "eslint", "vitest", "@vitest/coverage-v8", "@types/node", "tsx", "tsup"],
+    "lib": ["typescript", "eslint", "vitest", "@vitest/coverage-v8", "@types/node"],
+    "config": ["eslint", "vitest"],
+    "root": ["typescript", "eslint", "vitest", "@vitest/coverage-v8", "prettier", "@types/node"],
+    "root-turbo": ["turbo"]
+  },
+  "scripts": {
+    "web-next": {
+      "dev": "next dev --port {{web.port}}",
+      "build": "next build",
+      "start": "next start --port {{web.port}}",
+      "typecheck": "tsc --noEmit",
+      "lint": "eslint .",
+      "lint:fix": "eslint . --fix",
+      "test": "vitest run",
+      "test:ci": "vitest run --coverage"
+    },
+    "web-vite": {
+      "dev": "vite --port {{web.port}}",
+      "build": "vite build",
+      "preview": "vite preview --port {{web.port}}",
+      "typecheck": "tsc --noEmit",
+      "lint": "eslint .",
+      "lint:fix": "eslint . --fix",
+      "test": "vitest run",
+      "test:ci": "vitest run --coverage"
+    },
+    "api-node": {
+      "dev": "tsx watch --env-file-if-exists=.env src/server.ts",
+      "build": "tsup",
+      "start": "node --env-file-if-exists=.env dist/server.js",
+      "typecheck": "tsc --noEmit",
+      "lint": "eslint .",
+      "lint:fix": "eslint . --fix",
+      "test": "vitest run",
+      "test:ci": "vitest run --coverage"
+    },
+    "lib": {
+      "typecheck": "tsc --noEmit",
+      "lint": "eslint .",
+      "lint:fix": "eslint . --fix",
+      "test": "vitest run --passWithNoTests",
+      "test:ci": "vitest run --passWithNoTests --coverage"
+    },
+    "config": {
+      "lint": "eslint .",
+      "lint:fix": "eslint . --fix",
+      "test": "vitest run --passWithNoTests",
+      "test:ci": "vitest run --passWithNoTests"
+    },
+    "root-turbo": {
+      "dev": "turbo run dev",
+      "build": "turbo run build",
+      "typecheck": "turbo run typecheck",
+      "lint": "turbo run lint",
+      "lint:fix": "turbo run lint:fix",
+      "test": "turbo run test",
+      "test:ci": "turbo run test:ci"
+    },
+    "root-bun": {
+      "dev": "bun run --filter '*' dev",
+      "build": "bun run --filter '*' build",
+      "typecheck": "bun run --filter '*' typecheck",
+      "lint": "bun run --filter '*' lint",
+      "lint:fix": "bun run --filter '*' lint:fix",
+      "test": "bun run --filter '*' test",
+      "test:ci": "bun run --filter '*' test:ci"
+    },
+    "root-common": {
+      "check": "node scripts/check.mjs",
+      "format": "prettier --write ."
+    }
+  }
+}

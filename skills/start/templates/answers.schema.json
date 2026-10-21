@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tiago-o-pinheiro/agents-workflow/answers.schema.json",
+  "title": "dev project config (.dev/config.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "name", "scope", "layout", "packageManager", "frontend", "backend", "validation", "ui", "state", "orm", "auth", "extras", "pipeline", "recipes"],
+  "properties": {
+    "version": { "const": 1 },
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$" },
+    "scope": { "type": "string", "pattern": "^@[a-z][a-z0-9-]{1,40}$" },
+    "layout": { "enum": ["single", "turbo", "bun"] },
+    "packageManager": { "enum": ["pnpm", "bun"] },
+    "frontend": { "enum": ["next", "vite", "none"] },
+    "backend": { "enum": ["next", "fastify", "hono", "express", "none"] },
+    "validation": { "enum": ["typebox", "zod"] },
+    "ui": { "enum": ["own", "shadcn", "none"] },
+    "state": { "type": "array", "uniqueItems": true, "items": { "enum": ["context", "tanstack-query", "zustand"] } },
+    "orm": { "enum": ["prisma", "drizzle", "none"] },
+    "auth": { "enum": ["none", "better-auth", "google-jwt", "authjs"] },
+    "extras": { "type": "array", "uniqueItems": true, "items": { "enum": ["git-hooks", "ci", "claude-hooks", "i18n"] } },
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "maxFixLoops", "planApproval"],
+      "properties": {
+        "profile": { "enum": ["quality", "balanced", "budget"] },
+        "maxFixLoops": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["S", "M", "L"],
+          "properties": {
+            "S": { "type": "integer", "minimum": 0, "maximum": 6 },
+            "M": { "type": "integer", "minimum": 0, "maximum": 6 },
+            "L": { "type": "integer", "minimum": 0, "maximum": 8 }
+          }
+        },
+        "planApproval": { "type": "array", "uniqueItems": true, "items": { "enum": ["S", "M", "L"] } }
+      }
+    },
+    "recipes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status"],
+        "properties": {
+          "id": { "enum": ["orm-prisma", "orm-drizzle", "auth-better-auth", "auth-google-jwt", "auth-authjs", "ui-shadcn", "state-tanstack-query", "state-zustand"] },
+          "status": { "enum": ["pending", "done", "failed", "skipped"] }
+        }
+      }
+    }
+  }
+}

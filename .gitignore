@@ -1,0 +1,5 @@
+node_modules/
+.private-words
+.scratch/
+.DS_Store
+*.log

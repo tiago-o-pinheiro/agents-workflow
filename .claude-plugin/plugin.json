@@ -1,0 +1,9 @@
+{
+  "name": "dev",
+  "description": "Project wizard and tiered multi-agent dev pipeline: plan (Opus), code (Sonnet), test, QA, senior review (Opus), bug hunt (Fable). Layered TypeScript conventions, token-based design system, monorepo-ready.",
+  "author": { "name": "Tiago Pinheiro", "url": "https://github.com/tiago-o-pinheiro" },
+  "homepage": "https://github.com/tiago-o-pinheiro/agents-workflow",
+  "repository": "https://github.com/tiago-o-pinheiro/agents-workflow",
+  "license": "MIT",
+  "keywords": ["scaffold", "wizard", "subagents", "pipeline", "code-review", "monorepo", "design-system", "typescript", "nextjs", "fastify"]
+}
