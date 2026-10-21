@@ -72,7 +72,7 @@ Before reporting, verify:
 - Gates are green on the final state of the files.
 - Only in-scope files changed (`git status --short`).
 - No `any`/`as`/`!`/ts-comments, no TODOs, no commented-out code, no unused exports.
-- Naming and structure match the sibling files you read.
+- Naming and structure match the sibling files you read; no vague names (`created`, `updated`, `existing`), specs included.
 - Fix mode: every assigned finding header is updated and no other finding was touched.
 
 ## Report
