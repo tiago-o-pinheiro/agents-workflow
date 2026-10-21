@@ -1,0 +1,5 @@
+{
+  "deps": {
+    "@api": ["@fastify/type-provider-typebox", "ajv-formats"]
+  }
+}

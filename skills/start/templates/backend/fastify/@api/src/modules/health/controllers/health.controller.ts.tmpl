@@ -1,0 +1,19 @@
+import { StatusCodes } from 'http-status-codes'
+
+import { Models } from '{{imports.models}}'
+
+import { encode } from '@/lib/codec'
+import { type Handler } from '@/lib/handler'
+import { type GetHealthApiSchema } from '@/modules/health/schemas/health.api-schema'
+import { type HealthService, healthService } from '@/modules/health/services/health.service'
+
+export class HealthController {
+  constructor(private readonly healthService: HealthService) {}
+
+  getHealth: Handler<GetHealthApiSchema> = async (_request, reply) => {
+    const health = encode(Models.Health, this.healthService.getStatus())
+    return reply.status(StatusCodes.OK).send(health)
+  }
+}
+
+export const healthController = new HealthController(healthService)

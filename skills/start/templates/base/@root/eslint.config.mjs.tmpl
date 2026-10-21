@@ -1,0 +1,10 @@
+import { createEslintConfig } from '{{imports.config}}/eslint/index.mjs'
+
+export default createEslintConfig({
+  rootDir: import.meta.dirname,
+  scope: '{{project.scope}}',
+  frontend: '{{answers.frontend}}',
+  webDir: '{{paths.web}}',
+  apiDir: '{{paths.api}}',
+  envFile: '{{paths.envFile}}',
+})

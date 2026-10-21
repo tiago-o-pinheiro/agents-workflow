@@ -36,6 +36,7 @@
     "@types/supertest": "^7.2.1",
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/coverage-v8": "^5.0.5",
+    "ajv-formats": "^3.0.1",
     "better-auth": "^1.7.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

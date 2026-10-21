@@ -213,6 +213,7 @@ const buildImports = (a, mono) => {
     i18n: spec('i18n', '@/i18n'),
     config: spec('config', './config'),
     api: a.backend === 'next' ? '@/server' : '',
+    apiSrc: a.backend === 'next' ? '@/server' : '@',
   };
 };
 
@@ -373,7 +374,7 @@ export const buildPackages = (answers, targets, registry, metas, versions, conte
     }
     for (const [target, map] of Object.entries(meta.exports ?? {})) {
       const owner = targets.get(target)?.owner;
-      if (packages[owner]) packages[owner].exports = map;
+      if (packages[owner] && owner === target) packages[owner].exports = map;
     }
     trusted.push(...(meta.trusted ?? []));
   }

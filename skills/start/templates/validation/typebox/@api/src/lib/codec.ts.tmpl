@@ -1,0 +1,14 @@
+import { type TSchema } from 'typebox'
+import { Value } from 'typebox/value'
+
+import { ValidationError } from '{{imports.apiSrc}}/errors/http-errors'
+
+export const decode = <Schema extends TSchema>(schema: Schema, input: unknown) => {
+  if (!Value.Check(schema, input)) {
+    throw new ValidationError('Validation failed', Value.Errors(schema, input))
+  }
+  return Value.Decode(schema, input)
+}
+
+export const encode = <Schema extends TSchema>(schema: Schema, value: unknown) =>
+  Value.Encode(schema, value)

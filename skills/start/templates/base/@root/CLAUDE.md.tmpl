@@ -1,0 +1,39 @@
+# {{project.title}}
+
+## Stack
+
+{{docs.stack}}
+
+## Where things go
+
+{{docs.layers}}
+
+Backend modules live at `modules/<domain>/{routers,controllers,services,schemas}/<domain>.<layer>.ts`.
+Shared schemas live in the models layer and are imported as `Models.X`.
+
+## Commands
+
+{{docs.commands}}
+
+Run `{{pm.run}} check` or `node scripts/check.mjs` (add `--full` to include build) before reporting done.
+
+## Conventions
+
+{{docs.conventions}}
+
+These files override any default. Read the relevant ones before writing code.
+
+## Critical rules
+
+1. Hooks return at most 4 values and are never wrappers over other hooks; call hooks directly where the values are used.
+2. Layers only: router, controller, service, ORM. Controllers never touch the ORM.
+3. Throw typed errors (`GlobalError` subclasses). One error handler builds the response.
+4. Tokens only: no hex, no px, no arbitrary Tailwind values.
+5. Specs sit next to the source and read `it('Given X, should Y')`.
+6. No `as` casts (except `as const`), no `any`, no `!`, no enums, no comments, arrow functions only.
+7. Env is read in one typed module; never `process.env` elsewhere.
+8. Before done: `node scripts/check.mjs` must pass.
+
+## Pipeline
+
+`/dev:feature <request> [--tier S|M|L]` plans, implements, tests and reviews a feature. Run state is in `.dev/runs/` (ignored); durable lessons go to `.dev/learnings.md`.

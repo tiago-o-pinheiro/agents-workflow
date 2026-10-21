@@ -1,0 +1,23 @@
+{
+  "devDeps": {
+    "@config": [
+      "@eslint/js",
+      "@next/eslint-plugin-next",
+      "@types/node",
+      "eslint-plugin-import-x",
+      "eslint-plugin-react-hooks",
+      "eslint-plugin-unicorn",
+      "globals",
+      "typescript",
+      "typescript-eslint"
+    ]
+  },
+  "exports": {
+    "@config": {
+      "./*": "./*"
+    }
+  },
+  "trusted": [
+    "unrs-resolver"
+  ]
+}

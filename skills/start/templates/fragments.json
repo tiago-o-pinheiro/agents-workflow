@@ -3,7 +3,6 @@
   "fragments": [
     { "id": "base", "dir": "base", "when": {} },
     { "id": "config", "dir": "config", "when": {} },
-    { "id": "layout-single", "dir": "layout/single", "when": { "layout": ["single"] } },
     { "id": "layout-workspace", "dir": "layout/workspace", "when": { "layout": ["turbo", "bun"] } },
     { "id": "layout-turbo", "dir": "layout/turbo", "when": { "layout": ["turbo"] } },
     { "id": "validation-typebox", "dir": "validation/typebox", "when": { "validation": ["typebox"] } },
