@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
-  <img alt="/dev, a Claude Code plugin: scaffold a TypeScript project, then ship every feature planned, gated and reviewed" src="docs/assets/banner-light.svg" width="100%">
+  <img alt="/capitan, a Claude Code plugin: scaffold a TypeScript project, then ship every feature planned, gated and reviewed" src="docs/assets/banner-light.svg" width="100%">
 </picture>
 
 <br>
@@ -26,10 +26,10 @@
 
 ```text
 /plugin marketplace add tiago-o-pinheiro/agents-workflow
-/plugin install dev@tiago-devkit
+/plugin install capitan@capitan
 ```
 
-That's it. The plugin adds about **500 tokens** to each session; everything else loads only when a command or agent runs. Update later with `/plugin marketplace update tiago-devkit`.
+That's it. The plugin adds about **500 tokens** to each session; everything else loads only when a command or agent runs. Update later with `/plugin marketplace update capitan`.
 
 > [!TIP]
 > On a new machine, those two lines are the whole setup. Prefer plain files? Use the [install script](#install-without-the-marketplace) instead.
@@ -40,18 +40,18 @@ That's it. The plugin adds about **500 tokens** to each session; everything else
 
 | Command | When | What happens |
 |:--|:--|:--|
-| **`/dev:start`** | New project | A short wizard picks the stack, composes the project from tested templates, runs the gates, then lets coder agents apply the recipes you chose (database, auth, UI kit, state). |
-| **`/dev:feature`** | Any change | Triages the request into **S**, **M** or **L** and runs only as much process as the change deserves: plan, code, test, review, bug hunt. |
-| **`/dev:adopt`** | Existing repo | Adds the conventions docs, the gate script and the pipeline config without overwriting anything, so `/dev:feature` works there too. |
+| **`/capitan:start`** | New project | A short wizard picks the stack, composes the project from tested templates, runs the gates, then lets coder agents apply the recipes you chose (database, auth, UI kit, state). |
+| **`/capitan:feature`** | Any change | Triages the request into **S**, **M** or **L** and runs only as much process as the change deserves: plan, code, test, review, bug hunt. |
+| **`/capitan:adopt`** | Existing repo | Adds the conventions docs, the gate script and the pipeline config without overwriting anything, so `/capitan:feature` works there too. |
 
 ```text
-/dev:start shop turbo next fastify zod          words after the name prefill the wizard
-/dev:start blog --defaults                      skip the questions
+/capitan:start acme turbo next fastify zod          words after the name prefill the wizard
+/capitan:start blog --defaults                      skip the questions
 
-/dev:feature add a notes list with a create form
-/dev:feature add rate limiting to the API --tier L
-/dev:feature fix the header date format --tier S --profile budget
-/dev:feature --resume                           continue an interrupted run
+/capitan:feature add a notes list with a create form
+/capitan:feature add rate limiting to the API --tier L
+/capitan:feature fix the header date format --tier S --profile budget
+/capitan:feature --resume                           continue an interrupted run
 ```
 
 Bare names (`/start`, `/feature`) also work as long as no other skill claims them.
@@ -109,7 +109,7 @@ The rules live in [`skills/conventions`](skills/conventions/SKILL.md) and are co
 
 ```text
 single app                              monorepo
-shop/                                   shop/
+acme/                                   acme/
 ├─ src/          app code by layer      ├─ apps/web  apps/api
 ├─ docs/conventions/                    ├─ packages/models  ui  tokens  config ...
 ├─ scripts/check.mjs   gate runner      ├─ docs/conventions/  scripts/check.mjs

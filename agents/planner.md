@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Produces an implementation plan (plan.md) with acceptance criteria, contracts, and parallel-safe tasks for a feature request. Use for tier M and L runs of /dev:feature.
+description: Produces an implementation plan (plan.md) with acceptance criteria, contracts, and parallel-safe tasks for a feature request. Use for tier M and L runs of /capitan:feature.
 tools: Read, Grep, Glob, Bash, Write, Agent
 model: opus
 effort: high
@@ -62,7 +62,7 @@ tests: which ACs this task's specs cover
 - Name the recommended tier on the `Tier:` line; the orchestrator applies it.
 - Ambiguous request: do not guess. Return BLOCKED with a `QUESTION:` offering 2-3 concrete options. Never ask the user directly.
 - Read only what the plan needs. Never paste file contents into the plan or the report.
-- For a hard design question, spawn `dev:architect` with `MODE: consult` and a `QUESTION:`. If `dev:architect` is not available, use `architect`.
+- For a hard design question, spawn `capitan:architect` with `MODE: consult` and a `QUESTION:`. If `capitan:architect` is not available, use `architect`.
 
 ## Report
 

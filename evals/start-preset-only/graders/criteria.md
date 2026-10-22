@@ -7,6 +7,6 @@ A successful response satisfies all of:
 
 - no wizard questions are asked
 - layout is turbo with pnpm
-- scope is @shop
+- scope is @acme
 - scaffold.mjs ran with the normalized answers
 - final output lists the pending recipes

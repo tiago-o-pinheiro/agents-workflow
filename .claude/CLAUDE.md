@@ -1,6 +1,6 @@
 # agents-workflow: authoring guide
 
-This repo is the `dev` Claude Code plugin (and the `tiago-devkit` marketplace). This file guides anyone editing the repo; the plugin does not load it for users.
+This repo is the `capitan` Claude Code plugin (and the `capitan` marketplace). This file guides anyone editing the repo; the plugin does not load it for users.
 
 Contracts live in `docs/architecture.md` (scaffold, fragments, context keys, packages) and `skills/feature/references/protocol.md` (pipeline). Read the relevant one before writing code that touches it.
 
@@ -9,8 +9,8 @@ Contracts live in `docs/architecture.md` (scaffold, fragments, context keys, pac
 ```
 .claude-plugin/        plugin.json, marketplace.json
 agents/                planner, coder, architect, tester, qa, senior-reviewer, bug-hunter
-skills/start/          /dev:start wizard, scaffold.mjs, templates/, recipes/
-skills/feature/        /dev:feature orchestrator, run.mjs, check.mjs, protocol.md
+skills/start/          /capitan:start wizard, scaffold.mjs, templates/, recipes/
+skills/feature/        /capitan:feature orchestrator, run.mjs, check.mjs, protocol.md
 skills/conventions/    coding constitution + references/
 skills/adopt/          overlay onto existing repos
 scripts/               repo tooling (validate-repo.mjs)
@@ -36,7 +36,7 @@ docs/architecture.md   contracts
   - Skills: `name`, `description` (third person, what + when, ≤250 chars), optional `argument-hint`, `disable-model-invocation`, `allowed-tools`, `paths`, `effort`. User-only commands (`start`, `feature`, `adopt`) set `disable-model-invocation: true`.
   - `allowed-tools` Bash rules use the space form: `Bash(node *)`, `Bash(git *)`.
   - Agents: `name`, `description` (≤200 chars), `tools`, `model`, `effort`, `maxTurns`, `skills`, `color`. Plugin agents ignore `hooks`, `mcpServers`, `permissionMode`; never use them.
-- Agent references inside skills and agents: `dev:<name>`, plus the rule "if `dev:<name>` is not listed, use `<name>`" (install.sh mode has bare names).
+- Agent references inside skills and agents: `capitan:<name>`, plus the rule "if `capitan:<name>` is not listed, use `<name>`" (install.sh mode has bare names).
 - Paths between skills: `${CLAUDE_SKILL_DIR}/../<skill>/...`. Never `${CLAUDE_PLUGIN_ROOT}` (absent in install.sh mode).
 - Inter-agent reports follow the report block in `protocol.md` section 5.
 

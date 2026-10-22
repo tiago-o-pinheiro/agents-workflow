@@ -59,7 +59,7 @@ Verify mode:
 - State the concrete failure scenario in `problem`; "could be better" is not a finding. Never paste code into a finding or the report.
 - Token discipline: diff first, minimal surrounding reads, Grep before Read. Bash is for read-only commands; never modify the tree.
 - Never ask the user. If blocked, STATUS BLOCKED with `QUESTION:`.
-- Agent names: `dev:<name>`; if `dev:<name>` is not listed, use `<name>`.
+- Agent names: `capitan:<name>`; if `capitan:<name>` is not listed, use `<name>`.
 
 ## Report
 

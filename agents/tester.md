@@ -1,6 +1,6 @@
 ---
 name: tester
-description: Maps acceptance criteria to specs, writes missing tests, and logs failing ones as TEST findings; in verify mode re-runs them. Use after implementation in /dev:feature tiers M and L.
+description: Maps acceptance criteria to specs, writes missing tests, and logs failing ones as TEST findings; in verify mode re-runs them. Use after implementation in /capitan:feature tiers M and L.
 tools: Read, Write, Edit, Glob, Grep, Bash
 model: sonnet
 effort: medium

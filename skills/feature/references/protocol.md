@@ -153,7 +153,7 @@ Gates always run before qa, senior-reviewer, or bug-hunter. An open GATE finding
 
 ## 8. Resume
 
-`/dev:feature --resume [id]`: `run.mjs context` shows the active run; continue at `phase`. Agents are stateless; everything needed is in the run folder.
+`/capitan:feature --resume [id]`: `run.mjs context` shows the active run; continue at `phase`. Agents are stateless; everything needed is in the run folder.
 
 ## 9. Learnings
 

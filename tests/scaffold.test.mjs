@@ -51,7 +51,7 @@ const makeFixture = () => {
   return dir;
 };
 
-const norm = (raw) => normalizeAnswers({ name: 'shop', ...raw }).answers;
+const norm = (raw) => normalizeAnswers({ name: 'acme', ...raw }).answers;
 const FULLSTACK = { frontend: 'vite', backend: 'fastify' };
 const NEXT = { frontend: 'next', backend: 'next' };
 
@@ -62,14 +62,14 @@ before(() => {
 
 describe('normalizeAnswers', () => {
   it('applies defaults', () => {
-    const { answers, notices } = normalizeAnswers({ name: 'shop', frontend: 'next', backend: 'none' });
+    const { answers, notices } = normalizeAnswers({ name: 'acme', frontend: 'next', backend: 'none' });
     assert.equal(answers.layout, 'single');
     assert.equal(answers.packageManager, 'pnpm');
     assert.equal(answers.validation, 'typebox');
     assert.equal(answers.ui, 'own');
     assert.deepEqual(answers.state, ['context']);
     assert.deepEqual(answers.extras, ['git-hooks', 'claude-hooks']);
-    assert.equal(answers.scope, '@shop');
+    assert.equal(answers.scope, '@acme');
     assert.deepEqual(answers.pipeline, { profile: 'balanced', maxFixLoops: { S: 2, M: 3, L: 4 }, planApproval: ['L'] });
     assert.deepEqual(notices, []);
   });
@@ -93,26 +93,26 @@ describe('normalizeAnswers', () => {
   });
 
   it('auto-corrects with notices', () => {
-    const forced = normalizeAnswers({ name: 'shop', ...FULLSTACK, layout: 'single' });
+    const forced = normalizeAnswers({ name: 'acme', ...FULLSTACK, layout: 'single' });
     assert.equal(forced.answers.layout, 'turbo');
     assert.match(forced.notices[0], /single.*turbo/);
-    const turboBun = normalizeAnswers({ name: 'shop', ...FULLSTACK, packageManager: 'bun' });
+    const turboBun = normalizeAnswers({ name: 'acme', ...FULLSTACK, packageManager: 'bun' });
     assert.equal(turboBun.answers.packageManager, 'pnpm');
     assert.equal(turboBun.notices.length, 1);
-    const noFront = normalizeAnswers({ name: 'shop', frontend: 'none', backend: 'fastify', ui: 'shadcn', state: ['zustand'] });
+    const noFront = normalizeAnswers({ name: 'acme', frontend: 'none', backend: 'fastify', ui: 'shadcn', state: ['zustand'] });
     assert.equal(noFront.answers.ui, 'none');
     assert.deepEqual(noFront.answers.state, []);
     assert.equal(noFront.notices.length, 1);
-    const uiNone = normalizeAnswers({ name: 'shop', ...FULLSTACK, ui: 'none' });
+    const uiNone = normalizeAnswers({ name: 'acme', ...FULLSTACK, ui: 'none' });
     assert.equal(uiNone.answers.ui, 'own');
-    const noBack = normalizeAnswers({ name: 'shop', frontend: 'next', backend: 'none', orm: 'prisma', auth: 'authjs' });
+    const noBack = normalizeAnswers({ name: 'acme', frontend: 'next', backend: 'none', orm: 'prisma', auth: 'authjs' });
     assert.equal(noBack.answers.orm, 'none');
     assert.equal(noBack.answers.auth, 'none');
     assert.equal(noBack.notices.length, 1);
   });
 
   it('derives recipes in order and keeps known statuses', () => {
-    const raw = { name: 'shop', ...FULLSTACK, orm: 'prisma', auth: 'better-auth', ui: 'shadcn', state: ['zustand', 'tanstack-query'], recipes: [{ id: 'orm-prisma', status: 'done' }] };
+    const raw = { name: 'acme', ...FULLSTACK, orm: 'prisma', auth: 'better-auth', ui: 'shadcn', state: ['zustand', 'tanstack-query'], recipes: [{ id: 'orm-prisma', status: 'done' }] };
     const { answers } = normalizeAnswers(raw);
     assert.deepEqual(answers.recipes, [
       { id: 'orm-prisma', status: 'done' },
@@ -124,7 +124,7 @@ describe('normalizeAnswers', () => {
   });
 
   it('is idempotent', () => {
-    const first = normalizeAnswers({ name: 'shop', ...FULLSTACK, orm: 'drizzle' });
+    const first = normalizeAnswers({ name: 'acme', ...FULLSTACK, orm: 'drizzle' });
     const second = normalizeAnswers(first.answers);
     assert.deepEqual(second.answers, first.answers);
     assert.deepEqual(second.notices, []);
@@ -202,14 +202,14 @@ describe('buildContext', () => {
   it('computes monorepo and single keys', () => {
     const mono = norm(FULLSTACK);
     const ctx = buildContext(mono, resolveTargets(mono), versions, ['git.md']);
-    assert.equal(ctx['project.title'], 'Shop');
+    assert.equal(ctx['project.title'], 'Acme');
     assert.equal(ctx['pm.packageManager'], `pnpm@${versions.tooling.pnpm}`);
-    assert.equal(ctx['imports.models'], '@shop/models');
-    assert.equal(ctx['css.theme'], '@shop/tokens/theme.css');
+    assert.equal(ctx['imports.models'], '@acme/models');
+    assert.equal(ctx['css.theme'], '@acme/tokens/theme.css');
     assert.equal(ctx['css.uiSource'], '../../../packages/ui/src');
     assert.equal(ctx['paths.webCss'], 'apps/web/src/styles.css');
     assert.equal(ctx['api.url'], 'http://localhost:3001');
-    assert.equal(ctx['next.transpilePackages'], '["@shop/models","@shop/core","@shop/tokens","@shop/ui"]');
+    assert.equal(ctx['next.transpilePackages'], '["@acme/models","@acme/core","@acme/tokens","@acme/ui"]');
     assert.equal(ctx['tsconfig.preset'], 'react');
     assert.equal(ctx['docs.conventions'], '- docs/conventions/git.md');
 
@@ -239,18 +239,18 @@ describe('buildPackages', () => {
     const pkgs = build(FULLSTACK);
     assert.deepEqual(Object.keys(pkgs), ['apps/api/package.json', 'apps/web/package.json', 'package.json', 'packages/config/package.json', 'packages/core/package.json', 'packages/models/package.json', 'packages/tokens/package.json', 'packages/ui/package.json']);
     const web = pkgs['apps/web/package.json'];
-    assert.equal(web.name, '@shop/web');
-    assert.equal(web.dependencies['@shop/ui'], 'workspace:*');
-    assert.equal(web.dependencies['@shop/core'], 'workspace:*');
-    assert.equal(web.dependencies['@shop/i18n'], undefined);
-    assert.equal(web.devDependencies['@shop/config'], 'workspace:*');
-    assert.equal(pkgs['packages/config/package.json'].devDependencies['@shop/config'], undefined);
+    assert.equal(web.name, '@acme/web');
+    assert.equal(web.dependencies['@acme/ui'], 'workspace:*');
+    assert.equal(web.dependencies['@acme/core'], 'workspace:*');
+    assert.equal(web.dependencies['@acme/i18n'], undefined);
+    assert.equal(web.devDependencies['@acme/config'], 'workspace:*');
+    assert.equal(pkgs['packages/config/package.json'].devDependencies['@acme/config'], undefined);
     assert.deepEqual(pkgs['packages/ui/package.json'].exports, { '.': './src/index.ts' });
     assert.equal(pkgs['apps/api/package.json'].exports, undefined);
     const root = pkgs['package.json'];
-    assert.equal(root.name, 'shop');
+    assert.equal(root.name, 'acme');
     assert.equal(root.devDependencies.turbo, versions.packages.turbo);
-    assert.equal(root.devDependencies['@shop/config'], 'workspace:*');
+    assert.equal(root.devDependencies['@acme/config'], 'workspace:*');
     assert.equal(root.scripts.dev, 'turbo run dev');
     assert.equal(root.scripts.check, 'node scripts/check.mjs');
     assert.deepEqual(root.engines, { node: '>=22' });
@@ -276,13 +276,13 @@ describe('buildPackages', () => {
     assert.equal(root.scripts['db:studio'], 'prisma studio');
     assert.equal(root.scripts.dev, 'next dev --port 3000');
     assert.equal(root.devDependencies.turbo, undefined);
-    assert.equal(Object.keys(root.devDependencies).some((k) => k.startsWith('@shop/')), false);
+    assert.equal(Object.keys(root.devDependencies).some((k) => k.startsWith('@acme/')), false);
   });
 
   it('merges next backend deps into the web package', () => {
     const pkgs = build({ ...NEXT, layout: 'turbo' }, [{ deps: { '@api': ['next'] }, exports: { '@models': { '.': './x.ts' } } }]);
     assert.equal(pkgs['apps/web/package.json'].dependencies.next, versions.packages.next);
-    assert.equal(pkgs['apps/web/package.json'].dependencies['@shop/models'], 'workspace:*');
+    assert.equal(pkgs['apps/web/package.json'].dependencies['@acme/models'], 'workspace:*');
     assert.deepEqual(pkgs['packages/models/package.json'].exports, { '.': './x.ts' });
     assert.equal(pkgs['apps/api/package.json'], undefined);
   });
@@ -301,7 +301,7 @@ describe('planScaffold', () => {
   const noDocs = { conventionsDir: join(tmpdir(), 'missing-conventions'), checkFile: join(tmpdir(), 'missing-check.mjs') };
 
   it('plans fragment files, later wins, binary copy, skipped virtual files', () => {
-    const plan = planScaffold({ answers: { name: 'shop', ...NEXT }, templatesDir: templates, ...noDocs });
+    const plan = planScaffold({ answers: { name: 'acme', ...NEXT }, templatesDir: templates, ...noDocs });
     const paths = plan.files.map((f) => f.path);
     assert.deepEqual(paths, [...paths].sort((a, b) => a.localeCompare(b)));
     assert.ok(paths.includes('.gitignore'));
@@ -310,17 +310,17 @@ describe('planScaffold', () => {
     assert.ok(!paths.includes('models/README.md') && !paths.some((p) => p.endsWith('README.md')));
     assert.ok(paths.includes('src/server/server.ts'));
     const claude = plan.files.find((f) => f.path === 'CLAUDE.md');
-    assert.match(claude.content, /^# Shop\n- `pnpm dev`/);
+    assert.match(claude.content, /^# Acme\n- `pnpm dev`/);
     assert.equal(plan.files.find((f) => f.path === 'notes.md').copyFrom.endsWith('notes.md'), true);
     assert.equal(plan.files.find((f) => f.path === 'src/server/server.ts').content, 'export const port = 3000;\n');
     assert.equal(plan.files.find((f) => f.path === 'AGENTS.md').symlinkTo, 'CLAUDE.md');
     assert.ok(plan.notices.some((n) => /conventions docs not found/.test(n)));
-    assert.equal(plan.packages['package.json'].scripts.hello, 'echo shop');
+    assert.equal(plan.packages['package.json'].scripts.hello, 'echo acme');
     assert.deepEqual(JSON.parse(plan.files.find((f) => f.path === '.dev/scaffold.json').content).fragments, ['base', 'config', 'models', 'api']);
   });
 
   it('--only limits fragments and skips packages', () => {
-    const plan = planScaffold({ answers: { name: 'shop', ...NEXT }, templatesDir: templates, only: ['base'], ...noDocs });
+    const plan = planScaffold({ answers: { name: 'acme', ...NEXT }, templatesDir: templates, only: ['base'], ...noDocs });
     const paths = plan.files.map((f) => f.path);
     assert.ok(!paths.includes('package.json') && !paths.includes('pnpm-workspace.yaml'));
     assert.ok(!paths.includes('src/models/index.ts'));
@@ -330,18 +330,18 @@ describe('planScaffold', () => {
   it('throws for a missing fragment dir and unknown template key', () => {
     const dir = makeFixture();
     writeFileSync(join(dir, 'fragments.json'), JSON.stringify({ ...real, fragments: [{ id: 'ghost', dir: 'ghost', when: {} }] }));
-    assert.throws(() => planScaffold({ answers: { name: 'shop', ...NEXT }, templatesDir: dir, ...noDocs }), /ghost/);
+    assert.throws(() => planScaffold({ answers: { name: 'acme', ...NEXT }, templatesDir: dir, ...noDocs }), /ghost/);
     writeFileSync(join(dir, 'fragments.json'), JSON.stringify({ ...real, fragments: FIXTURE_FRAGMENTS }));
     put(dir, 'base/@root/bad.txt.tmpl', '{{nope.key}}');
-    assert.throws(() => planScaffold({ answers: { name: 'shop', ...NEXT }, templatesDir: dir, ...noDocs }), /bad\.txt\.tmpl.*nope\.key/);
+    assert.throws(() => planScaffold({ answers: { name: 'acme', ...NEXT }, templatesDir: dir, ...noDocs }), /bad\.txt\.tmpl.*nope\.key/);
   });
 });
 
 describe('cli', () => {
   const cli = (...args) => execFileSync('node', [SCRIPT, '--templates', templates, ...args], { encoding: 'utf8' });
   const sets = [
-    { name: 'shop', ...FULLSTACK },
-    { name: 'shop', ...NEXT, extras: ['i18n'] },
+    { name: 'acme', ...FULLSTACK },
+    { name: 'acme', ...NEXT, extras: ['i18n'] },
     { name: 'api-only', frontend: 'none', backend: 'fastify', packageManager: 'bun' },
   ];
 
@@ -387,6 +387,6 @@ describe('cli', () => {
 
 
 it('render leaves GitHub Actions expressions untouched', () => {
-  const output = render('${{ runner.os }}-{{project.name}}', { 'project.name': 'shop' }, 'ci.yml.tmpl');
-  assert.equal(output, '${{ runner.os }}-shop');
+  const output = render('${{ runner.os }}-{{project.name}}', { 'project.name': 'acme' }, 'ci.yml.tmpl');
+  assert.equal(output, '${{ runner.os }}-acme');
 });
