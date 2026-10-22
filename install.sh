@@ -129,6 +129,6 @@ echo "summary: installed=$installed ok=$ok skipped=$skipped"
 echo "Installed as personal skills: use /start, /feature, /adopt (bare names). Do not also install the plugin, or you get duplicates."
 
 plugins_file="$HOME/.claude/plugins/installed_plugins.json"
-if [ -f "$plugins_file" ] && grep -q 'capitan@capitan' "$plugins_file"; then
-  echo "warning: the plugin capitan@capitan is also installed; uninstall it to avoid duplicate commands." >&2
+if [ -f "$plugins_file" ] && grep -q 'agents@team' "$plugins_file"; then
+  echo "warning: the plugin agents@team is also installed; uninstall it to avoid duplicate commands." >&2
 fi

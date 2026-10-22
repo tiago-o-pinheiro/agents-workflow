@@ -6,7 +6,7 @@ disable-model-invocation: true
 allowed-tools: Read, Write, Edit, AskUserQuestion, Agent, SendMessage, Bash(node *), Bash(git *)
 ---
 
-# /capitan:feature
+# /agents:feature
 
 Pipeline state: !`node "${CLAUDE_SKILL_DIR}/scripts/run.mjs" context`
 
@@ -23,13 +23,13 @@ You orchestrate. You never read, write, or edit source code. Your context stays 
 
 ## Agent names
 
-Spawn `capitan:<agent>` (planner, coder, architect, tester, qa, senior-reviewer, bug-hunter). If `capitan:<agent>` is not in your agent list, use `<agent>`.
+Spawn `agents:<agent>` (planner, coder, architect, tester, qa, senior-reviewer, bug-hunter). If `agents:<agent>` is not in your agent list, use `<agent>`.
 
 ## Arguments
 
 `$ARGUMENTS`: request text, plus optional `--tier S|M|L`, `--profile quality|balanced|budget`, `--resume [id]`.
 
-- No `.dev/config.json` in the project: tell the user `/capitan:adopt` gives the best results, then proceed with defaults (`run.mjs` handles them). No `scripts/check.mjs`: `run.mjs check` falls back to its own copy.
+- No `.dev/config.json` in the project: tell the user `/agents:adopt` gives the best results, then proceed with defaults (`run.mjs` handles them). No `scripts/check.mjs`: `run.mjs check` falls back to its own copy.
 - `--resume [id]`: take the active run (or `id`) from the context line, read `RUN_JS findings --open`, and continue at the run's `phase` using the matching sequence below. Do not re-run finished phases.
 - Empty request and no `--resume`: ask the user for the request.
 - Otherwise start a new run: triage, then `RUN_JS init "<request>" --tier <T> [--profile <p>]`. It prints the run id and folder; `RUN` = `.dev/runs/<id>`.

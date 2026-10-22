@@ -18,11 +18,11 @@ Maintainer document. Not loaded by the plugin. Every writer of scripts, template
 
 | Path | Role |
 |---|---|
-| `skills/start/SKILL.md` | `/capitan:start` wizard: questions, then `scaffold.mjs`, then recipes via `coder`, then gates |
+| `skills/start/SKILL.md` | `/agents:start` wizard: questions, then `scaffold.mjs`, then recipes via `coder`, then gates |
 | `skills/start/scripts/scaffold.mjs` | Deterministic composer: answers + fragments + versions → files, package.json, install |
 | `skills/start/templates/` | `fragments.json` registry, `versions.json`, `answers.schema.json`, fragment dirs |
 | `skills/start/recipes/*.md` | Integration steps a `coder` agent executes (ORM, auth, shadcn, state libs) |
-| `skills/feature/SKILL.md` | `/capitan:feature` orchestrator |
+| `skills/feature/SKILL.md` | `/agents:feature` orchestrator |
 | `skills/feature/scripts/run.mjs` | Run state, snapshots, diff, ledger, gates wrapper |
 | `skills/feature/scripts/check.mjs` | Gate runner with filtered output; copied into each generated project as `scripts/check.mjs` |
 | `skills/conventions/` | The coding constitution; references are copied into generated projects as `docs/conventions/` |
