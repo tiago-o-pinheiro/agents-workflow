@@ -1,12 +1,12 @@
 ---
 name: start
-description: Scaffolds a new TypeScript project (Next.js, Vite React, Node API; single app or monorepo) with layered architecture, a token-based design system, conventions docs and the /dev:feature pipeline config.
+description: Scaffolds a new TypeScript project (Next.js, Vite React, Node API; single app or monorepo) with layered architecture, a token-based design system, conventions docs and the /agents:feature pipeline config.
 argument-hint: "[name] [preset words...] [--defaults]"
 disable-model-invocation: true
 allowed-tools: Read, Write, Edit, AskUserQuestion, Agent, Bash(node *), Bash(git *), Bash(pnpm *), Bash(bun *), Bash(ls *), Bash(mkdir *), Bash(corepack *), Bash(docker *), Bash(cd *)
 ---
 
-# /dev:start
+# /agents:start
 
 Scaffold a project from a short wizard, verify it, then let coders apply the recipes. You orchestrate; you never write project files.
 
@@ -23,10 +23,10 @@ Arguments: `$ARGUMENTS`
 
 ## Rules
 
-- Never edit generated files yourself; delegate to `dev:coder`. The only file you edit is `.dev/config.json` (recipe status).
+- Never edit generated files yourself; delegate to `agents:coder`. The only file you edit is `.dev/config.json` (recipe status).
 - Keep your context small: do not read generated source. Read only command output, `.dev/config.json` and agent reports.
 - Subagents never talk to the user. You relay their questions and answers.
-- Agent names: use `dev:<name>`; if `dev:<name>` is not listed, use `<name>`.
+- Agent names: use `agents:<name>`; if `agents:<name>` is not listed, use `<name>`.
 - Never push.
 
 ## 1. Preflight
@@ -117,7 +117,7 @@ Relay its output (15 lines at most). On error, show the message, fix the answers
 
 Run `cd "<dir>" && node scripts/check.mjs --full` (every later command also runs inside the target). On PASS go to step 7.
 
-On FAIL, repair (max 2 attempts): spawn `dev:coder` with exactly:
+On FAIL, repair (max 2 attempts): spawn `agents:coder` with exactly:
 
 ```
 MODE: recipe
@@ -132,7 +132,7 @@ Re-run the gate after each attempt. Still failing after 2: report the remaining 
 Skip this step and step 8 when `.dev/config.json` has no recipes.
 
 1. In the target run `node "${CLAUDE_SKILL_DIR}/../feature/scripts/run.mjs" init "scaffold recipes" --tier S`. It snapshots the clean scaffold as base. Note the printed run folder as `<RUN>`.
-2. Read `.dev/config.json` `recipes`. For each `pending` recipe, in order, spawn a fresh `dev:coder`:
+2. Read `.dev/config.json` `recipes`. For each `pending` recipe, in order, spawn a fresh `agents:coder`:
 
 ```
 MODE: recipe
@@ -143,7 +143,7 @@ NOTE: recipe=${CLAUDE_SKILL_DIR}/recipes/<id>.md
 3. Handle the report:
    - `DONE`: set the recipe `status` to `done` with Edit. Run `node scripts/check.mjs`.
    - `BLOCKED`: ask the user the `QUESTION` with AskUserQuestion, then resume the coder with SendMessage, or re-spawn with the answer in `NOTE`.
-   - `NEEDS_CONSULT`: spawn `dev:architect` with `MODE: consult` and the `QUESTION`; pass its answer back to the coder the same way.
+   - `NEEDS_CONSULT`: spawn `agents:architect` with `MODE: consult` and the `QUESTION`; pass its answer back to the coder the same way.
 4. Check FAIL: one repair attempt as in step 6 (`SCOPE: recipe:repair`). Still red: set the recipe `failed` with Edit and continue with the next recipe.
 5. Coder cannot finish or reports FAIL: set `failed`, continue.
 
@@ -153,14 +153,14 @@ Only if at least one recipe ran.
 
 1. `run.mjs check --full`, then `run.mjs snapshot` (same `run.mjs` path as step 7).
 2. Write `<RUN>/task.md`: one section per recipe that ran, listing its "Done when" bullets as acceptance criteria (AC-1, AC-2, ...). Read the bullets from `${CLAUDE_SKILL_DIR}/recipes/<id>.md`.
-3. Spawn `dev:qa`:
+3. Spawn `agents:qa`:
 
 ```
 MODE: review
 RUN: <RUN>
 ```
 
-4. Open blocker or major findings (`run.mjs findings --open`): up to 2 fix rounds. Each round: spawn `dev:coder` with `MODE: fix`, `RUN: <RUN>`, `SCOPE: <open ids>`; then `run.mjs check`, `run.mjs snapshot`, and `dev:qa` with `MODE: verify`, `RUN: <RUN>`.
+4. Open blocker or major findings (`run.mjs findings --open`): up to 2 fix rounds. Each round: spawn `agents:coder` with `MODE: fix`, `RUN: <RUN>`, `SCOPE: <open ids>`; then `run.mjs check`, `run.mjs snapshot`, and `agents:qa` with `MODE: verify`, `RUN: <RUN>`.
 5. Run `run.mjs finish`. Findings still open after 2 rounds go in the summary.
 
 ## 9. Finish
@@ -171,7 +171,7 @@ Print a summary:
 - Layout, package manager, packages.
 - Recipes with status (done, failed, skipped).
 - Gate result.
-- Next commands: `cd <dir>`, `<pm> dev`, `/dev:feature <request>`.
-- For each `failed` recipe: the one-line cause and how to retry (`/dev:feature` with the recipe goal).
+- Next commands: `cd <dir>`, `<pm> dev`, `/agents:feature <request>`.
+- For each `failed` recipe: the one-line cause and how to retry (`/agents:feature` with the recipe goal).
 
 Ask with AskUserQuestion: Commit | Leave uncommitted. On Commit run `git add -A && git commit -m "chore: scaffold <name>"` in the target. Never push.

@@ -5,7 +5,7 @@
 Conventional Commits: `type(scope): subject`.
 
 - Types: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `chore`, `ci`, `build`, `style`.
-- Scope = package or domain (`feat(api): ...`, `fix(checkout): ...`). Omit when the change spans everything.
+- Scope = package or domain (`feat(api): ...`, `fix(notes): ...`). Omit when the change spans everything.
 - Subject: imperative, lowercase start, no trailing period, at most 72 chars.
 - Body (optional) explains why, not what; wrap at 100.
 - Breaking change: `!` after scope and a `BREAKING CHANGE:` footer.
@@ -20,7 +20,7 @@ before decoding. Decode first, then compare.
 
 ## Branches
 
-`type/short-slug`: `feat/cart-totals`, `fix/login-redirect`. Branch from `main`.
+`type/short-slug`: `feat/notes-search`, `fix/login-redirect`. Branch from `main`.
 
 ## Never commit
 

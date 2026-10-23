@@ -1,15 +1,15 @@
 {
-  "name": "tiago-devkit",
-  "description": "Tiago's dev kit: a project wizard and a tiered multi-agent pipeline for TypeScript projects.",
+  "name": "team",
+  "description": "A project wizard and a tiered multi-agent pipeline for TypeScript projects.",
   "owner": {
     "name": "Tiago Pinheiro",
     "url": "https://github.com/tiago-o-pinheiro"
   },
   "plugins": [
     {
-      "name": "dev",
+      "name": "agents",
       "source": "./",
-      "description": "Project wizard (/dev:start) and tiered multi-agent dev pipeline (/dev:feature) with shared coding conventions."
+      "description": "Project wizard (/agents:start) and tiered multi-agent dev pipeline (/agents:feature) with shared coding conventions."
     }
   ]
 }

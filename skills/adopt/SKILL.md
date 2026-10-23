@@ -1,13 +1,13 @@
 ---
 name: adopt
-description: Adds the dev conventions docs, gate script and pipeline config to an existing TypeScript repo without overwriting files, so /dev:feature works there.
+description: Adds the conventions docs, gate script and pipeline config to an existing TypeScript repo without overwriting files, so /agents:feature works there.
 disable-model-invocation: true
 allowed-tools: Read, Write, Edit, AskUserQuestion, Bash(node *), Bash(git *), Bash(ls *)
 ---
 
 # adopt
 
-Overlay the dev workflow onto the current repo. Never overwrite an existing file. Never touch application code.
+Overlay the workflow onto the current repo. Never overwrite an existing file. Never touch application code.
 
 ## 1. Detect the stack
 
@@ -45,8 +45,8 @@ If ESLint is a dependency, ask whether to add the lint-on-edit hook (runs eslint
 
 ## 4. CLAUDE.md
 
-- Missing: write one under 100 lines: stack, commands (from package.json scripts), the `docs/conventions` file list, and "Pipeline: `/dev:feature <request>`; state in `.dev/`".
-- Present: draft a `## Dev pipeline` section (conventions location, gate command `node scripts/check.mjs`, `/dev:feature` usage, `.dev/config.json`). Show it, AskUserQuestion Append | Skip, then Edit to append. Change nothing else.
+- Missing: write one under 100 lines: stack, commands (from package.json scripts), the `docs/conventions` file list, and "Pipeline: `/agents:feature <request>`; state in `.dev/`".
+- Present: draft a `## Dev pipeline` section (conventions location, gate command `node scripts/check.mjs`, `/agents:feature` usage, `.dev/config.json`). Show it, AskUserQuestion Append | Skip, then Edit to append. Change nothing else.
 
 Add `.dev/runs/` and `.dev/map.md` to `.gitignore` if absent (append; ask only if the file is unusual).
 
@@ -66,4 +66,4 @@ Report pass/fail per gate. Failures that already existed are information: do not
 
 At most 8 lines: what was written, what was skipped, gate result, missing scripts if any, and:
 
-`Next: /dev:feature <request>`
+`Next: /agents:feature <request>`

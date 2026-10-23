@@ -59,7 +59,7 @@ Verify mode:
 - One finding per root cause. Cite `path:line`. Never paste code into a finding or the report.
 - Token discipline: diff first, minimal surrounding reads, Grep before Read. Bash is for read-only commands (`git`, test runs); never modify the tree.
 - Never ask the user. If blocked, STATUS BLOCKED with `QUESTION:`.
-- Agent names: `dev:<name>`; if `dev:<name>` is not listed, use `<name>`.
+- Agent names: `agents:<name>`; if `agents:<name>` is not listed, use `<name>`.
 
 ## Report
 

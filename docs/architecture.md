@@ -18,11 +18,11 @@ Maintainer document. Not loaded by the plugin. Every writer of scripts, template
 
 | Path | Role |
 |---|---|
-| `skills/start/SKILL.md` | `/dev:start` wizard: questions, then `scaffold.mjs`, then recipes via `coder`, then gates |
+| `skills/start/SKILL.md` | `/agents:start` wizard: questions, then `scaffold.mjs`, then recipes via `coder`, then gates |
 | `skills/start/scripts/scaffold.mjs` | Deterministic composer: answers + fragments + versions → files, package.json, install |
 | `skills/start/templates/` | `fragments.json` registry, `versions.json`, `answers.schema.json`, fragment dirs |
 | `skills/start/recipes/*.md` | Integration steps a `coder` agent executes (ORM, auth, shadcn, state libs) |
-| `skills/feature/SKILL.md` | `/dev:feature` orchestrator |
+| `skills/feature/SKILL.md` | `/agents:feature` orchestrator |
 | `skills/feature/scripts/run.mjs` | Run state, snapshots, diff, ledger, gates wrapper |
 | `skills/feature/scripts/check.mjs` | Gate runner with filtered output; copied into each generated project as `scripts/check.mjs` |
 | `skills/conventions/` | The coding constitution; references are copied into generated projects as `docs/conventions/` |
@@ -112,24 +112,24 @@ Every package name must exist in `versions.json` (`packages`) → hard error oth
 
 | Key | Example (monorepo / single) |
 |---|---|
-| `project.name` `project.scope` `project.title` | `shop`, `@shop`, `Shop` |
+| `project.name` `project.scope` `project.title` | `acme`, `@acme`, `Acme` |
 | `pm.name` | `pnpm` / `bun` |
 | `pm.run` `pm.exec` `pm.install` | `pnpm` / `bun run`; `pnpm exec` / `bunx`; `pnpm install` / `bun install` |
 | `pm.packageManager` `pm.lockfile` | `pnpm@10.34.7`; `pnpm-lock.yaml` / `bun.lock` |
 | `node.version` | `24` |
 | `web.port` `api.port` `api.url` | `3000`, `3001`, `http://localhost:3001` |
-| `imports.models` | `@shop/models` / `@/models` |
-| `imports.core` | `@shop/core` / `@/core` |
-| `imports.tokens` | `@shop/tokens` / `@/design-system/tokens` |
-| `imports.ui` | `@shop/ui` / `@/design-system/ui` (deep: `{{imports.ui}}/button`) |
-| `imports.i18n` | `@shop/i18n` / `@/i18n` |
-| `imports.config` | `@shop/config` / `./config` (root-level files only) |
+| `imports.models` | `@acme/models` / `@/models` |
+| `imports.core` | `@acme/core` / `@/core` |
+| `imports.tokens` | `@acme/tokens` / `@/design-system/tokens` |
+| `imports.ui` | `@acme/ui` / `@/design-system/ui` (deep: `{{imports.ui}}/button`) |
+| `imports.i18n` | `@acme/i18n` / `@/i18n` |
+| `imports.config` | `@acme/config` / `./config` (root-level files only) |
 | `imports.api` | `@/server` for next backend, else empty |
 | `imports.apiSrc` | alias root of the API source: `@/server` for next backend, else `@`. Every file under `@api` that imports another API module and is shared with the next backend (backend-common, validation, glue) uses `{{imports.apiSrc}}/...` |
 | `paths.web` `paths.api` `paths.apiSrc` `paths.models` `paths.core` `paths.tokens` `paths.ui` `paths.i18n` `paths.config` | actual dirs relative to project root; empty string when inactive |
 | `paths.envFile` | `apps/api/src/config/env.ts` / `src/server/config/env.ts`; empty when no backend |
 | `paths.webCss` | `apps/web/src/app/globals.css` (next) / `src/styles.css` (vite); empty when no frontend |
-| `css.theme` `css.contract` | `@shop/tokens/theme.css`, `@shop/tokens/tailwind.css` / relative from `paths.webCss` dir |
+| `css.theme` `css.contract` | `@acme/tokens/theme.css`, `@acme/tokens/tailwind.css` / relative from `paths.webCss` dir |
 | `css.uiSource` | relative dir from `paths.webCss` dir to ui src (for `@source`) |
 | `next.transpilePackages` | JSON array literal of active internal package names; `[]` in single |
 | `tsconfig.preset` | `next` / `react` / `node` (single root tsconfig) |

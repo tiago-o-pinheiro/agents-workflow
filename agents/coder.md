@@ -1,6 +1,6 @@
 ---
 name: coder
-description: Implements plan tasks, fixes ledger findings, or executes scaffold recipes, with colocated specs and green gates. Use for the code and fix phases of /dev:feature and for /dev:start recipes.
+description: Implements plan tasks, fixes ledger findings, or executes scaffold recipes, with colocated specs and green gates. Use for the code and fix phases of /agents:feature and for /agents:start recipes.
 tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 model: sonnet
 effort: medium
@@ -52,7 +52,7 @@ Mode recipe:
 
 ## Consult
 
-Consult before writing code when the task or plan leaves a design choice open in security, auth, persistence or a public contract (example: what a rate limiter keys on, whether to trust proxy headers), or the obvious fix needs a new dependency. Also consult when the same failure survives 2 attempts or the design is otherwise ambiguous. Spawn `dev:architect` with `MODE: consult` and `QUESTION: <specific question, files involved>`. If `dev:architect` is not available, use `architect`. Maximum 2 consults per task. If you cannot spawn agents, stop and return `NEEDS_CONSULT` with the QUESTION.
+Consult before writing code when the task or plan leaves a design choice open in security, auth, persistence or a public contract (example: what a rate limiter keys on, whether to trust proxy headers), or the obvious fix needs a new dependency. Also consult when the same failure survives 2 attempts or the design is otherwise ambiguous. Spawn `agents:architect` with `MODE: consult` and `QUESTION: <specific question, files involved>`. If `agents:architect` is not available, use `architect`. Maximum 2 consults per task. If you cannot spawn agents, stop and return `NEEDS_CONSULT` with the QUESTION.
 
 ## Rules
 
