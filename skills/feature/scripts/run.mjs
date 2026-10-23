@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import {
   appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync,
   realpathSync, rmSync, writeFileSync,
@@ -12,7 +13,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const MAX_OUT = 20;
 const DEFAULT_LOOPS = { S: 2, M: 3, L: 4 };
 const HEADER = /^## (GATE|TEST|QA|SR|BH)-(\d+) · (blocker|major|minor) · (.+)$/;
-const PATHSPEC = ['--', '.', ':(exclude)*lock*', ':(exclude)*.lock', ':(exclude).dev/**'];
+const LOCKFILES = ['pnpm-lock.yaml', 'bun.lock', 'bun.lockb', 'yarn.lock', 'package-lock.json', 'npm-shrinkwrap.json'];
+const PATHSPEC = ['--', '.', ...LOCKFILES.map((name) => `:(glob,exclude)**/${name}`), ':(exclude).dev/**'];
 const SET_KEYS = ['phase', 'tier', 'round', 'maxRounds', 'profile', 'consults'];
 const NUMERIC = ['round', 'maxRounds', 'consults'];
 const USAGE = [
@@ -29,7 +31,7 @@ const USAGE = [
 class CliError extends Error {}
 
 const out = (lines) => console.log(lines.slice(0, MAX_OUT).join('\n'));
-const now = () => new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+const now = () => new Date().toISOString();
 const readJson = (path) => {
   try {
     return JSON.parse(readFileSync(path, 'utf8'));
@@ -182,6 +184,19 @@ export const topScope = (files) => {
 
 const runsDir = () => join('.dev', 'runs');
 
+export const reserveRunId = (baseId, parent = runsDir()) => {
+  mkdirSync(parent, { recursive: true });
+  for (let n = 1; ; n++) {
+    const id = n === 1 ? baseId : `${baseId}-${n}`;
+    try {
+      mkdirSync(join(parent, id));
+      return id;
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+    }
+  }
+};
+
 const loadRun = (id) => {
   const state = readJson(join(runsDir(), id, 'state.json'));
   if (!state) throw new CliError(`run not found: ${id}`);
@@ -203,12 +218,10 @@ const resolveRun = (args) => {
 
 const activeRun = () => {
   if (!existsSync(runsDir())) return null;
-  const ids = readdirSync(runsDir()).sort().reverse();
-  for (const id of ids) {
-    const state = readJson(join(runsDir(), id, 'state.json'));
-    if (state && !['done', 'aborted'].includes(state.phase)) return state;
-  }
-  return null;
+  return readdirSync(runsDir())
+    .map((id) => readJson(join(runsDir(), id, 'state.json')))
+    .filter((state) => state && !['done', 'aborted'].includes(state.phase))
+    .sort((a, b) => (Date.parse(b.createdAt) || 0) - (Date.parse(a.createdAt) || 0) || b.id.localeCompare(a.id))[0] ?? null;
 };
 
 const saveState = (state) => {
@@ -243,8 +256,7 @@ const cmdInit = (args) => {
   const config = readJson(join('.dev', 'config.json')) ?? {};
   const tier = flagValue(args, '--tier') ?? 'M';
   if (!DEFAULT_LOOPS[tier]) throw new CliError(`invalid tier: ${tier}`);
-  const id = runId(request);
-  mkdirSync(join(runsDir(), id), { recursive: true });
+  const id = reserveRunId(runId(request));
   writeFileSync(join(runsDir(), id, 'findings.md'), '# Findings\n');
   ensureGitignore(['.dev/runs/', '.dev/map.md']);
   const base = takeSnapshot(id, 'base');
@@ -373,21 +385,23 @@ const SKIP_PATH = /(^|\/)(node_modules|dist|\.next|build)\//;
 const SKIP_FILE = /\.(spec|test)\.[^/]+$|\.d\.ts$/;
 
 const listSources = () =>
-  git(['ls-files', '-co', '--exclude-standard']).split('\n')
+  [...new Set(git(['ls-files', '-co', '--exclude-standard']).split('\n'))]
     .filter((f) => /\.(ts|tsx|mjs)$/.test(f) && !SKIP_PATH.test(f) && !SKIP_FILE.test(f) && existsSync(f))
     .sort();
 
 const cmdMap = (args) => {
   const target = join('.dev', 'map.md');
   const head = git(['rev-parse', '--verify', '-q', 'HEAD'], { allowFail: true }) ?? 'none';
-  const marker = `<!-- head: ${head} -->`;
+  const sources = listSources().map((file) => [file, readFileSync(file, 'utf8')]);
+  const hash = createHash('sha256').update(JSON.stringify(sources)).digest('hex');
+  const marker = `<!-- head: ${head} -->\n<!-- sources: ${hash} -->`;
   if (!args.includes('--force') && existsSync(target) && readFileSync(target, 'utf8').startsWith(marker)) {
     out([`${target} (cached, ${readFileSync(target, 'utf8').split('\n').length - 1} lines)`]);
     return;
   }
-  const lines = [marker];
-  for (const file of listSources()) {
-    const names = extractExports(readFileSync(file, 'utf8'));
+  const lines = marker.split('\n');
+  for (const [file, source] of sources) {
+    const names = extractExports(source);
     if (names.length) lines.push(`${file}: ${names.join(', ')}`);
   }
   mkdirSync('.dev', { recursive: true });

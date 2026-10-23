@@ -444,11 +444,18 @@ const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 
 export const planScaffold = ({ answers: rawAnswers, templatesDir = DEFAULTS.templatesDir, conventionsDir = DEFAULTS.conventionsDir, checkFile = DEFAULTS.checkFile, only = null, date = new Date().toISOString().slice(0, 10) }) => {
-  const { answers, notices } = normalizeAnswers(rawAnswers);
-  const targets = resolveTargets(answers);
   const registry = readJson(join(templatesDir, 'fragments.json'));
+  const selected = only?.map((id) => id === 'claude-hooks' ? 'extras-claude-hooks' : id);
+  const known = new Set(['docs', 'check', ...registry.fragments.map((fragment) => fragment.id)]);
+  const unknown = selected?.filter((id) => !known.has(id)) ?? [];
+  if (unknown.length) fail(`unknown --only selectors: ${unknown.join(', ')}`);
+  const { answers, notices } = normalizeAnswers(rawAnswers);
+  if (selected?.includes('extras-claude-hooks') && !answers.extras.includes('claude-hooks')) {
+    answers.extras.push('claude-hooks');
+  }
+  const targets = resolveTargets(answers);
   const versions = readJson(join(templatesDir, 'versions.json'));
-  const wants = (id) => !only || only.includes(id);
+  const wants = (id) => !selected || selected.includes(id);
   const fragments = selectFragments(registry, answers).filter((fragment) => wants(fragment.id));
 
   const docNames = wants('docs') ? conventionDocs(answers).filter((name) => existsSync(join(conventionsDir, name))) : [];

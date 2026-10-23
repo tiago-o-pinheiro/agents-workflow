@@ -327,6 +327,22 @@ describe('planScaffold', () => {
     assert.ok(paths.includes('.dev/config.json'));
   });
 
+  it('--only claude-hooks installs the hook even when extras were disabled', () => {
+    for (const selector of ['claude-hooks', 'extras-claude-hooks']) {
+      const plan = planScaffold({ answers: { name: 'acme', ...NEXT, extras: [] }, only: [selector] });
+      const paths = plan.files.map((file) => file.path);
+      assert.ok(paths.includes('.claude/settings.json'));
+      assert.ok(paths.includes('.claude/hooks/lint-edited.mjs'));
+      assert.ok(!paths.includes('package.json'));
+      assert.ok(plan.answers.extras.includes('claude-hooks'));
+      assert.deepEqual(JSON.parse(plan.files.find((file) => file.path === '.dev/scaffold.json').content).fragments, ['extras-claude-hooks']);
+    }
+  });
+
+  it('rejects unknown --only selectors instead of silently writing nothing', () => {
+    assert.throws(() => planScaffold({ answers: { name: 'acme', ...NEXT }, only: ['claude-hook'] }), /unknown --only selectors: claude-hook/);
+  });
+
   it('throws for a missing fragment dir and unknown template key', () => {
     const dir = makeFixture();
     writeFileSync(join(dir, 'fragments.json'), JSON.stringify({ ...real, fragments: [{ id: 'ghost', dir: 'ghost', when: {} }] }));
