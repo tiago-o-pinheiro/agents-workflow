@@ -128,6 +128,15 @@ run_combo() {
     return 0
   fi
 
+  if [ "$layout" = "turbo" ]; then
+    if node "$ROOT/tests/turbo-cache.mjs" "$dir/node_modules/.bin/turbo"; then
+      record "$name" cache PASS
+    else
+      record "$name" cache FAIL
+      return 0
+    fi
+  fi
+
   local log="$SMOKE_DIR/$name.server.log" result="PASS"
   if [ "$frontend" = "next" ] && [ "$backend" = "next" ]; then
     serve_check "$dir" "$log" "$WEB_PORT" "http://localhost:$WEB_PORT/api/health" "$pm" exec next start -p "$WEB_PORT" || result="FAIL"

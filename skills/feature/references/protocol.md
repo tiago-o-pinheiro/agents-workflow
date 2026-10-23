@@ -16,7 +16,8 @@ Shared contract for the `feature` orchestrator, `run.mjs`, and every agent.
 
 ## 1. Run folder
 
-`.dev/runs/<yyyymmdd-hhmm>-<slug>/` (slug: kebab-case, at most 5 words from the request).
+`.dev/runs/<yyyymmdd-hhmm>-<slug>/` (slug: kebab-case, at most 5 words from the request). Reserve folders atomically; on a collision append `-2`, `-3`, etc. Never reuse a run folder.
+The active run is the newest unfinished run by `createdAt` (millisecond precision), independent of its slug or collision suffix.
 
 | File | Writer | Content |
 |---|---|---|
@@ -66,11 +67,12 @@ Invoked as `node <skill dir>/scripts/run.mjs <cmd>` from the project root. Every
 | `set key=value ...` | Update `phase`, `tier`, `round`, `maxRounds`, `profile`, `consults` |
 | `log <agent> <STATUS> "<note>"` | Append to `history` |
 | `findings [--open]` | One line per finding: `ID · severity · status · where` |
-| `map` | Write `.dev/map.md` (exported symbols per source file, keyed by HEAD), print its path |
+| `map` | Write `.dev/map.md` (exported symbols per source file, keyed by HEAD and source paths/content), print its path |
 | `finish` | Set `phase: done`, delete `refs/dev/<id>/*`, print scope, task titles, and changed file count for the commit message |
 | `abort` | Set `phase: aborted`, delete refs |
 
 Snapshots never touch the user's index: temporary `GIT_INDEX_FILE`, `git add -A`, `write-tree`, `commit-tree`, `update-ref`. Works in a repo with no commits.
+Diffs exclude only known package-manager lockfile names and `.dev/`; source names containing `lock` remain visible.
 
 ## 4. Findings ledger
 

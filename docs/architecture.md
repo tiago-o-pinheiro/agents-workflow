@@ -157,7 +157,7 @@ Also generated in code: `AGENTS.md` symlink to `CLAUDE.md`; `docs/conventions/*.
 
 Post steps unless `--skip-install`: target must be empty except `.git` (or `--overlay`, which never overwrites); write; `git init -b main` when `git rev-parse --show-toplevel` is not the target; install (`pnpm install`, falling back to `corepack pnpm install`; `bun install`); `<pm exec> prettier --write .`. Output ≤15 lines: target, layout, file count, pending recipes, next command.
 
-CLI: `node scaffold.mjs --answers <file|json> --target <dir> [--dry-run] [--overlay] [--only <fragment ids or groups: base,docs,check,claude-hooks>] [--skip-install]`. `--dry-run` prints the sorted output path list and the generated package.json files as JSON, writes nothing.
+CLI: `node scaffold.mjs --answers <file|json> --target <dir> [--dry-run] [--overlay] [--only <fragment ids or groups: base,docs,check,claude-hooks>] [--skip-install]`. `claude-hooks` aliases `extras-claude-hooks`; selecting it explicitly enables that extra. Unknown selectors are errors. `--dry-run` prints the sorted output path list and the generated package.json files as JSON, writes nothing.
 
 ## 8. Recipes
 
@@ -170,6 +170,7 @@ CLI: `node scaffold.mjs --answers <file|json> --target <dir> [--dry-run] [--over
 - Vitest: `{{imports.config}}/vitest/index.ts` exports `createVitestConfig({ root, environment, setupFiles, plugins, inlineDeps })`; `inlineDeps` maps to `test.server.deps.inline` for packages Vitest cannot load as external ESM. `root` is required and drives the `@` alias (`<root>/src`). Every package that has tests owns a `vitest.config.ts`. In a single app that is the deployable's config at the root. In a monorepo the root `vitest.config.ts` (layout-workspace) only lists `test.projects`. Tests import from `vitest` explicitly; there are no globals.
 - TypeScript 6 (`~6.0`, capped by typescript-eslint): presets `{{imports.config}}/tsconfig/{base,node,react,next}.json`. No `baseUrl`, since TS 6 deprecated it. Set `types` explicitly, since TS 6 defaults it to `[]`. Every package owns its `tsconfig.json`. App tsconfigs add `paths: { "@/*": ["./src/*"] }`.
 - Root files of a single app are owned by the deployable fragment, which writes them to its target root: frontend-next or frontend-vite (`@web/...`) and backend-<fw> (`@api/...` for API-only). backend-next never writes package-root files.
+- Turborepo: a scriptless `transit` task depends on `^transit`. Every cached gate and build depends on `^transit`, so source-only workspace dependencies invalidate consumer caches; build also retains `^build`.
 - Which fragment writes the per-package files (`tsconfig.json`, `vitest.config.ts`, `tsup.config.ts.tmpl`, `next.config.ts`, `vite.config.ts`, `.env.example`):
 
 | Target | Owning fragment |

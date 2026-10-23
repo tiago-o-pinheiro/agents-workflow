@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { detectPm, filterOutput, stripAnsi } from '../skills/feature/scripts/check.mjs';
-import { applyGates, parseFindings, slugify, topScope } from '../skills/feature/scripts/run.mjs';
+import { applyGates, parseFindings, reserveRunId, slugify, topScope } from '../skills/feature/scripts/run.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const CHECK = join(ROOT, 'skills/feature/scripts/check.mjs');
@@ -153,6 +153,76 @@ test('run: topScope names the package in a monorepo and the domain in a single a
   assert.equal(topScope(['src/a.ts', 'package.json']), '');
 });
 
+test('run: snapshots retain lock-named source files while excluding package lockfiles', (t) => {
+  const dir = gitRepo();
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const init = node(RUN, ['init', 'snapshot exclusions'], dir);
+  assert.equal(init.status, 0, init.stderr);
+  const id = /run: (\S+)/.exec(init.stdout)[1];
+  const sources = ['src/clock.ts', 'src/block.ts', 'src/lock-screen.tsx', 'src/blocks/index.ts', 'src/foo.lock.ts'];
+  const locks = ['pnpm-lock.yaml', 'bun.lock', 'bun.lockb', 'yarn.lock', 'package-lock.json', 'npm-shrinkwrap.json', 'apps/api/package-lock.json', 'packages/lib/bun.lock'];
+  for (const path of [...sources, ...locks]) write(dir, path, 'first\n');
+  write(dir, '.dev/config.json', '{}\n');
+  assert.equal(node(RUN, ['snapshot', '--run', id], dir).status, 0);
+  for (const path of sources) write(dir, path, 'second\n');
+  for (const path of locks) write(dir, path, 'second\n');
+  assert.equal(node(RUN, ['snapshot', '--run', id], dir).status, 0);
+  for (const patch of ['diff.patch', 'fix.patch']) {
+    const text = readFileSync(join(dir, '.dev/runs', id, patch), 'utf8');
+    for (const path of sources) assert.ok(text.includes(`b/${path}`), `${patch} missing ${path}`);
+    for (const path of [...locks, '.dev/config.json']) assert.ok(!text.includes(`b/${path}`), `${patch} includes ${path}`);
+  }
+  const finish = node(RUN, ['finish', '--run', id], dir);
+  assert.equal(finish.status, 0, finish.stderr);
+  assert.match(finish.stdout, new RegExp(`files changed: ${sources.length}\\b`));
+});
+
+test('run: directory reservations preserve existing runs on repeated collisions', (t) => {
+  const dir = tmp();
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const id = '20261023-1200-add-a-notes-list';
+  assert.equal(reserveRunId(id, dir), id);
+  write(dir, `${id}/findings.md`, 'keep this finding\n');
+  assert.equal(reserveRunId(id, dir), `${id}-2`);
+  write(dir, `${id}-3`, 'occupied by a file');
+  assert.equal(reserveRunId(id, dir), `${id}-4`);
+  assert.equal(readFileSync(join(dir, id, 'findings.md'), 'utf8'), 'keep this finding\n');
+});
+
+test('run: repeated init preserves findings, state and snapshot refs', (t) => {
+  const dir = gitRepo();
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const init = node(RUN, ['init', 'same request'], dir);
+  assert.equal(init.status, 0, init.stderr);
+  const id = /run: (\S+)/.exec(init.stdout)[1];
+  const finding = '# Findings\n\n## QA-1 · major · open\nwhere: src/a.ts:1\n';
+  write(dir, `.dev/runs/${id}/findings.md`, finding);
+  assert.equal(node(RUN, ['log', 'qa', 'FAIL', 'needs repair'], dir).status, 0);
+  const state = readFileSync(join(dir, `.dev/runs/${id}/state.json`), 'utf8');
+  const base = git(dir, 'rev-parse', `refs/dev/${id}/base`).stdout;
+  write(dir, 'src/a.ts', 'export const a = 2;\n');
+  const second = node(RUN, ['init', 'same request'], dir);
+  assert.equal(second.status, 0, second.stderr);
+  const next = /run: (\S+)/.exec(second.stdout)[1];
+  assert.notEqual(next, id);
+  assert.equal(readFileSync(join(dir, `.dev/runs/${id}/findings.md`), 'utf8'), finding);
+  assert.equal(readFileSync(join(dir, `.dev/runs/${id}/state.json`), 'utf8'), state);
+  assert.equal(git(dir, 'rev-parse', `refs/dev/${id}/base`).stdout, base);
+  assert.notEqual(git(dir, 'rev-parse', `refs/dev/${next}/base`).stdout, base);
+});
+
+test('run: active selection follows creation time instead of slug or collision suffix order', (t) => {
+  const dir = gitRepo();
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const ids = ['20261023-1200-zebra', '20261023-1200-alpha-9', '20261023-1200-alpha-10'];
+  ids.forEach((id, index) => write(dir, `.dev/runs/${id}/state.json`, JSON.stringify({
+    id, phase: 'code', createdAt: `2026-10-23T12:00:00.00${index}Z`,
+  })));
+  assert.match(node(RUN, ['context'], dir).stdout, new RegExp(`run: ${ids[2]}\\n`));
+  assert.equal(node(RUN, ['abort'], dir).status, 0);
+  assert.match(node(RUN, ['context'], dir).stdout, new RegExp(`run: ${ids[1]}\\n`));
+});
+
 test('run: check adds then verifies GATE entries', () => {
   const dir = gitRepo();
   write(dir, 'a.txt', 'x');
@@ -187,6 +257,35 @@ test('run: map and unknown command', () => {
   assert.match(map, /src\/a\.ts: a, b, T, c, e/);
   assert.doesNotMatch(map, /hidden/);
   assert.equal(node(RUN, ['bogus'], dir).status, 2);
+});
+
+test('run: map refreshes for staged and unstaged source edits, additions, renames and deletions', (t) => {
+  const dir = gitRepo();
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  write(dir, '.gitignore', '.dev/\n');
+  write(dir, 'src/a.ts', 'export const first = 1;\n');
+  git(dir, 'add', '.');
+  const refresh = () => {
+    const res = node(RUN, ['map'], dir);
+    assert.equal(res.status, 0, res.stderr);
+    return readFileSync(join(dir, '.dev/map.md'), 'utf8');
+  };
+  assert.match(refresh(), /src\/a\.ts: first/);
+  assert.match(node(RUN, ['map'], dir).stdout, /cached/);
+  write(dir, 'src/a.ts', 'export const other = 1;\n');
+  assert.match(refresh(), /src\/a\.ts: other/);
+  write(dir, 'src/a.ts', 'export const third = 1;\n');
+  git(dir, 'add', 'src/a.ts');
+  assert.match(refresh(), /src\/a\.ts: third/);
+  write(dir, 'src/new.ts', 'export const fresh = 1;\n');
+  assert.match(refresh(), /src\/new\.ts: fresh/);
+  renameSync(join(dir, 'src/new.ts'), join(dir, 'src/renamed.ts'));
+  const renamed = refresh();
+  assert.match(renamed, /src\/renamed\.ts: fresh/);
+  assert.doesNotMatch(renamed, /src\/new\.ts/);
+  rmSync(join(dir, 'src/a.ts'));
+  assert.doesNotMatch(refresh(), /src\/a\.ts/);
+  assert.match(node(RUN, ['map'], dir).stdout, /cached/);
 });
 
 test('validate-repo: reports budget and link violations', () => {
